@@ -1,0 +1,21 @@
+{
+  "name": "fast-noise",
+  "version": "0.0.1",
+  "description": "An implementation of noise algorithms in WebAssembly.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "build": "asc ./assembly/index.ts -b ./index.wasm -c --debug --sourceMap",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WesleyClements/fast-noise.git"
+  },
+  "author": "Wesley Clements",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/WesleyClements/fast-noise/issues"
+  },
+  "homepage": "https://github.com/WesleyClements/fast-noise#readme"
+}
