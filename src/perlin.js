@@ -173,14 +173,168 @@ function Perlin(stdlib, foreign, heap) {
 
     return +normalize(+lerp(y1, y2, c));
   }
+  function grad4D(hash, x, y, z, w) {
+    hash = hash | 0;
+    x = +x;
+    y = +y;
+    z = +z;
+    w = +w;
+    var a = 0.0;
+    var b = 0.0;
+    var c = 0.0;
+    hash = hash & 0x20;
+    a = y;
+    b = z;
+    c = w;
+    switch (hash >> 3) {
+      case 1:
+        a = w;
+        b = x;
+        c = y;
+        break;
+      case 2:
+        a = z;
+        b = w;
+        c = x;
+        break;
+      case 3:
+        a = y;
+        b = z;
+        c = w;
+        break;
+    }
+    return ((hash & 4) == 0 ? -a : a) + ((hash & 2) == 0 ? -b : b) + ((hash & 1) == 0 ? -c : c);
+  }
+  function perlin4D(x, y, z, w) {
+    x = +x;
+    y = +y;
+    z = +z;
+    w = +w;
+    var xi = 0;
+    var yi = 0;
+    var zi = 0;
+    var wi = 0;
+    var a = 0.0;
+    var b = 0.0;
+    var c = 0.0;
+    var d = 0.0;
 
-  return { setSeed: setSeed, perlin2D: perlin2D, perlin3D: perlin3D };
+    var A = 0;
+    var B = 0;
+    var AA = 0;
+    var BA = 0;
+    var AB = 0;
+    var BB = 0;
+    var AAA = 0;
+    var BAA = 0;
+    var ABA = 0;
+    var BBA = 0;
+    var AAB = 0;
+    var BAB = 0;
+    var ABB = 0;
+    var BBB = 0;
+
+    xi = (~~floor(x) - ~~floor(x / 256.0)) | 0;
+    yi = (~~floor(y) - ~~floor(y / 256.0)) | 0;
+    zi = (~~floor(z) - ~~floor(z / 256.0)) | 0;
+    wi = (~~floor(w) - ~~floor(w / 256.0)) | 0;
+    x = +(x - floor(x));
+    y = +(y - floor(y));
+    z = +(z - floor(z));
+    w = +(w - floor(w));
+    a = +fade(x);
+    b = +fade(y);
+    c = +fade(z);
+    d = +fade(w);
+
+    A = (hash[xi] + yi) | 0;
+    B = (hash[xi + 1] + yi) | 0;
+    AA = (hash[A] + zi) | 0;
+    BA = (hash[B] + zi) | 0;
+    AB = (hash[A + 1] + zi) | 0;
+    BB = (hash[B + 1] + zi) | 0;
+    AAA = (hash[AA] + wi) | 0;
+    BAA = (hash[BA] + wi) | 0;
+    ABA = (hash[AB] + wi) | 0;
+    BBA = (hash[BB] + wi) | 0;
+    AAB = (hash[AA + 1] + wi) | 0;
+    BAB = (hash[BA + 1] + wi) | 0;
+    ABB = (hash[AB + 1] + wi) | 0;
+    BBB = (hash[BB + 1] + wi) | 0;
+    return (
+      +(
+        +lerp(
+          +lerp(
+            +lerp(
+              +lerp(+grad4D(hash[AAA] | 0, x, y, z, w), +grad4D(hash[BAA] | 0, +(x - 1.0), y, z, w), a),
+              +lerp(
+                +grad4D(hash[ABA] | 0, x, +(y - 1.0), z, w),
+                +grad4D(hash[BBA] | 0, +(x - 1.0), +(y - 1.0), z, w),
+                a,
+              ),
+              b,
+            ),
+
+            +lerp(
+              +lerp(
+                +grad4D(hash[AAB] | 0, x, y, +(z - 1.0), w),
+                +grad4D(hash[BAB] | 0, +(x - 1.0), y, +(z - 1.0), w),
+                a,
+              ),
+              +lerp(
+                +grad4D(hash[ABB] | 0, x, +(y - 1.0), +(z - 1.0), w),
+                +grad4D(hash[BBB] | 0, +(x - 1.0), +(y - 1.0), +(z - 1.0), w),
+                a,
+              ),
+              b,
+            ),
+            c,
+          ),
+
+          +lerp(
+            +lerp(
+              +lerp(
+                +grad4D(hash[AAA + 1] | 0, x, y, z, +(w - 1.0)),
+                +grad4D(hash[BAA + 1] | 0, +(x - 1.0), y, z, +(w - 1.0)),
+                a,
+              ),
+              +lerp(
+                +grad4D(hash[ABA + 1] | 0, x, +(y - 1.0), z, +(w - 1.0)),
+                +grad4D(hash[BBA + 1] | 0, +(x - 1.0), +(y - 1.0), z, +(w - 1.0)),
+                a,
+              ),
+              b,
+            ),
+
+            +lerp(
+              +lerp(
+                +grad4D(hash[AAB + 1] | 0, x, y, +(z - 1.0), +(w - 1.0)),
+                +grad4D(hash[BAB + 1] | 0, +(x - 1.0), y, +(z - 1.0), +(w - 1.0)),
+                a,
+              ),
+              +lerp(
+                +grad4D(hash[ABB + 1] | 0, x, +(y - 1.0), +(z - 1.0), +(w - 1.0)),
+                +grad4D(hash[BBB + 1] | 0, +(x - 1.0), +(y - 1.0), +(z - 1.0), +(w - 1.0)),
+                a,
+              ),
+              b,
+            ),
+            c,
+          ),
+          d,
+        ) + 1.0
+      ) / 2.0
+    );
+  }
+
+  return { setSeed: setSeed, perlin2D: perlin2D, perlin3D: perlin3D, perlin4D: perlin4D };
 }
 
-const { setSeed, perlin2D, perlin3D } = Perlin({ Math, Uint8Array }, { setSeed: random.setSeed, nextUint8: random.nextUint8 }, heap);
+const { setSeed, perlin2D, perlin3D, perlin4D } = Perlin({ Math, Uint8Array }, { setSeed: random.setSeed, nextUint8: random.nextUint8 }, heap);
 setSeed(Date.now());
 export default {
   setSeed,
   perlin2D,
   perlin3D,
+  perlin4D
 }
