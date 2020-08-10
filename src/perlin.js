@@ -134,11 +134,6 @@ function Perlin(stdlib, foreign, heap) {
     var AB = 0;
     var BB = 0;
 
-    var x1 = 0.0;
-    var x2 = 0.0;
-    var y1 = 0.0;
-    var y2 = 0.0;
-
     xi = (~~floor(x) - ~~floor(x / 256.0)) | 0;
     yi = (~~floor(y) - ~~floor(y / 256.0)) | 0;
     zi = (~~floor(z) - ~~floor(z / 256.0)) | 0;
@@ -156,19 +151,37 @@ function Perlin(stdlib, foreign, heap) {
     AB = (heapU8[A + 1] + zi) | 0;
     BB = (heapU8[B + 1] + zi) | 0;
 
-    x1 = +lerp(+grad3D(heapU8[AA] | 0, x, y, z), +grad3D(heapU8[BA] | 0, +(x - 1.0), y, z), a);
-    x2 = +lerp(+grad3D(heapU8[AB] | 0, x, +(y - 1.0), z), +grad3D(heapU8[BB] | 0, +(x - 1.0), +(y - 1.0), z), a);
-    y1 = +lerp(x1, x2, b);
-
-    x1 = +lerp(+grad3D(heapU8[AA + 1] | 0, x, y, +(z - 1.0)), +grad3D(heapU8[BA + 1] | 0, +(x - 1.0), y, +(z - 1.0)), a);
-    x2 = +lerp(
-      +grad3D(heapU8[AB + 1] | 0, x, +(y - 1.0), +(z - 1.0)),
-      +grad3D(heapU8[BB + 1] | 0, +(x - 1.0), +(y - 1.0), +(z - 1.0)),
-      a,
+    return +normalize(
+      +lerp(
+        +lerp(
+          +lerp(
+            +grad3D(heapU8[AA] | 0, x, y, z),
+            +grad3D(heapU8[BA] | 0, +(x - 1.0), y, z),
+            a
+          ),
+          +lerp(
+            +grad3D(heapU8[AB] | 0, x, +(y - 1.0), z),
+            +grad3D(heapU8[BB] | 0, +(x - 1.0), +(y - 1.0), z),
+            a
+          ),
+          b
+        ),
+        +lerp(
+          +lerp(
+            +grad3D(heapU8[AA + 1] | 0, x, y, +(z - 1.0)),
+            +grad3D(heapU8[BA + 1] | 0, +(x - 1.0), y, +(z - 1.0)),
+            a
+          ),
+          +lerp(
+            +grad3D(heapU8[AB + 1] | 0, x, +(y - 1.0), +(z - 1.0)),
+            +grad3D(heapU8[BB + 1] | 0, +(x - 1.0), +(y - 1.0), +(z - 1.0)),
+            a,
+          ),
+          b
+        ),
+        c
+      )
     );
-    y2 = +lerp(x1, x2, b);
-
-    return +normalize(+lerp(y1, y2, c));
   }
   function grad4D(hash, x, y, z, w) {
     hash = hash | 0;
@@ -176,31 +189,33 @@ function Perlin(stdlib, foreign, heap) {
     y = +y;
     z = +z;
     w = +w;
-    var a = 0.0;
-    var b = 0.0;
-    var c = 0.0;
-    hash = hash & 0x20;
-    a = y;
-    b = z;
-    c = w;
+    hash = hash & 0x1f;
     switch (hash >> 3) {
-      case 1:
-        a = w;
-        b = x;
-        c = y;
-        break;
-      case 2:
-        a = z;
-        b = w;
-        c = x;
-        break;
-      case 3:
-        a = y;
-        b = z;
-        c = w;
-        break;
+      case 0x01:
+        return (
+          ((hash & 4) == 0 ? -w : w) +
+          ((hash & 2) == 0 ? -x : x) +
+          ((hash & 1) == 0 ? -y : y)
+        );
+      case 0x10:
+        return (
+          ((hash & 4) == 0 ? -z : z) +
+          ((hash & 2) == 0 ? -w : w) +
+          ((hash & 1) == 0 ? -x : x)
+        );
+      case 0x11:
+        return (
+          ((hash & 4) == 0 ? -y : y) +
+          ((hash & 2) == 0 ? -z : z) +
+          ((hash & 1) == 0 ? -w : w)
+        );
+      default:
+        return (
+          ((hash & 4) == 0 ? -w : w) +
+          ((hash & 2) == 0 ? -y : y) +
+          ((hash & 1) == 0 ? -z : z)
+        );
     }
-    return ((hash & 4) == 0 ? -a : a) + ((hash & 2) == 0 ? -b : b) + ((hash & 1) == 0 ? -c : c);
   }
   function perlin4D(x, y, z, w) {
     x = +x;
