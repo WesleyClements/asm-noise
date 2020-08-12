@@ -1,7 +1,7 @@
-import random from "./random.js";
+import random from './random.js';
 
 function Perlin(stdlib, foreign, heap) {
-  "use asm";
+  'use asm';
   var floor = stdlib.Math.floor;
   var _setSeed = foreign.setSeed;
   var nextUint8 = foreign.nextUint8;
@@ -80,16 +80,8 @@ function Perlin(stdlib, foreign, heap) {
 
     return +normalize(
       +lerp(
-        +lerp(
-          +grad2D(heapUint8[A] | 0, x, y),
-          +grad2D(heapUint8[B] | 0, +(x - 1.0), y),
-          a
-        ),
-        +lerp(
-          +grad2D(heapUint8[A + 1] | 0, x, +(y - 1.0)),
-          +grad2D(heapUint8[B + 1] | 0, +(x - 1.0), +(y - 1.0)),
-          a
-        ),
+        +lerp(+grad2D(heapUint8[A] | 0, x, y), +grad2D(heapUint8[B] | 0, +(x - 1.0), y), a),
+        +lerp(+grad2D(heapUint8[A + 1] | 0, x, +(y - 1.0)), +grad2D(heapUint8[B + 1] | 0, +(x - 1.0), +(y - 1.0)), a),
         b
       )
     );
@@ -148,16 +140,8 @@ function Perlin(stdlib, foreign, heap) {
     return +normalize(
       +lerp(
         +lerp(
-          +lerp(
-            +grad3D(heapUint8[AA] | 0, x, y, z),
-            +grad3D(heapUint8[BA] | 0, +(x - 1.0), y, z),
-            a
-          ),
-          +lerp(
-            +grad3D(heapUint8[AB] | 0, x, +(y - 1.0), z),
-            +grad3D(heapUint8[BB] | 0, +(x - 1.0), +(y - 1.0), z),
-            a
-          ),
+          +lerp(+grad3D(heapUint8[AA] | 0, x, y, z), +grad3D(heapUint8[BA] | 0, +(x - 1.0), y, z), a),
+          +lerp(+grad3D(heapUint8[AB] | 0, x, +(y - 1.0), z), +grad3D(heapUint8[BB] | 0, +(x - 1.0), +(y - 1.0), z), a),
           b
         ),
         +lerp(
@@ -186,30 +170,14 @@ function Perlin(stdlib, foreign, heap) {
     w = +w;
     hash = hash & 0x1f;
     switch (hash >> 3) {
-      case 0x01:
-        return (
-          ((hash & 4) == 0 ? -w : w) +
-          ((hash & 2) == 0 ? -x : x) +
-          ((hash & 1) == 0 ? -y : y)
-        );
-      case 0x10:
-        return (
-          ((hash & 4) == 0 ? -z : z) +
-          ((hash & 2) == 0 ? -w : w) +
-          ((hash & 1) == 0 ? -x : x)
-        );
-      case 0x11:
-        return (
-          ((hash & 4) == 0 ? -y : y) +
-          ((hash & 2) == 0 ? -z : z) +
-          ((hash & 1) == 0 ? -w : w)
-        );
+      case 0b01:
+        return ((hash & 4) == 0 ? -w : w) + ((hash & 2) == 0 ? -x : x) + ((hash & 1) == 0 ? -y : y);
+      case 0b10:
+        return ((hash & 4) == 0 ? -z : z) + ((hash & 2) == 0 ? -w : w) + ((hash & 1) == 0 ? -x : x);
+      case 0b11:
+        return ((hash & 4) == 0 ? -y : y) + ((hash & 2) == 0 ? -z : z) + ((hash & 1) == 0 ? -w : w);
       default:
-        return (
-          ((hash & 4) == 0 ? -x : x) +
-          ((hash & 2) == 0 ? -y : y) +
-          ((hash & 1) == 0 ? -z : z)
-        );
+        return ((hash & 4) == 0 ? -x : x) + ((hash & 2) == 0 ? -y : y) + ((hash & 1) == 0 ? -z : z);
     }
   }
 
@@ -273,11 +241,7 @@ function Perlin(stdlib, foreign, heap) {
       +lerp(
         +lerp(
           +lerp(
-            +lerp(
-              +grad4D(heapUint8[AAA] | 0, x, y, z, w),
-              +grad4D(heapUint8[BAA] | 0, +(x - 1.0), y, z, w),
-              a
-            ),
+            +lerp(+grad4D(heapUint8[AAA] | 0, x, y, z, w), +grad4D(heapUint8[BAA] | 0, +(x - 1.0), y, z, w), a),
             +lerp(
               +grad4D(heapUint8[ABA] | 0, x, +(y - 1.0), z, w),
               +grad4D(heapUint8[BBA] | 0, +(x - 1.0), +(y - 1.0), z, w),
@@ -293,13 +257,7 @@ function Perlin(stdlib, foreign, heap) {
             ),
             +lerp(
               +grad4D(heapUint8[ABB] | 0, x, +(y - 1.0), +(z - 1.0), w),
-              +grad4D(
-                heapUint8[BBB] | 0,
-                +(x - 1.0),
-                +(y - 1.0),
-                +(z - 1.0),
-                w
-              ),
+              +grad4D(heapUint8[BBB] | 0, +(x - 1.0), +(y - 1.0), +(z - 1.0), w),
               a
             ),
             b
@@ -315,13 +273,7 @@ function Perlin(stdlib, foreign, heap) {
             ),
             +lerp(
               +grad4D(heapUint8[ABA + 1] | 0, x, +(y - 1.0), z, +(w - 1.0)),
-              +grad4D(
-                heapUint8[BBA + 1] | 0,
-                +(x - 1.0),
-                +(y - 1.0),
-                z,
-                +(w - 1.0)
-              ),
+              +grad4D(heapUint8[BBA + 1] | 0, +(x - 1.0), +(y - 1.0), z, +(w - 1.0)),
               a
             ),
             b
@@ -329,30 +281,12 @@ function Perlin(stdlib, foreign, heap) {
           +lerp(
             +lerp(
               +grad4D(heapUint8[AAB + 1] | 0, x, y, +(z - 1.0), +(w - 1.0)),
-              +grad4D(
-                heapUint8[BAB + 1] | 0,
-                +(x - 1.0),
-                y,
-                +(z - 1.0),
-                +(w - 1.0)
-              ),
+              +grad4D(heapUint8[BAB + 1] | 0, +(x - 1.0), y, +(z - 1.0), +(w - 1.0)),
               a
             ),
             +lerp(
-              +grad4D(
-                heapUint8[ABB + 1] | 0,
-                x,
-                +(y - 1.0),
-                +(z - 1.0),
-                +(w - 1.0)
-              ),
-              +grad4D(
-                heapUint8[BBB + 1] | 0,
-                +(x - 1.0),
-                +(y - 1.0),
-                +(z - 1.0),
-                +(w - 1.0)
-              ),
+              +grad4D(heapUint8[ABB + 1] | 0, x, +(y - 1.0), +(z - 1.0), +(w - 1.0)),
+              +grad4D(heapUint8[BBB + 1] | 0, +(x - 1.0), +(y - 1.0), +(z - 1.0), +(w - 1.0)),
               a
             ),
             b
@@ -379,7 +313,7 @@ const { setSeed, perlin2D, perlin3D, perlin4D } = Perlin(
     Uint8Array,
   },
   {
-    setSeed: random.setSeed,
+    setSeed: (value) => (random.seed = value),
     nextUint8: random.nextUint8,
   },
   heap
