@@ -1,8 +1,10 @@
-const seed = new BigInt64Array(2);
+const heap = new BigInt64Array(2);
+const seed = 0;
+const current = 1;
 
 function nextBigInt64() {
-  seed[1] = seed[1] * 6364136223846793005n + 1442695040888963407n;
-  return seed[1];
+  heap[current] = heap[current] * 6364136223846793005n + 1442695040888963407n;
+  return heap[current];
 }
 
 function nextBigUint64() {
@@ -46,11 +48,11 @@ function nextBool() {
 export default {
   set seed(value) {
     if (typeof value !== 'bigint') value = BigInt(value);
-    seed[0] = value;
-    seed[1] = value;
+    heap[seed] = value;
+    heap[current] = value;
   },
   get seed() {
-    return seed[0];
+    return heap[seed];
   },
   nextInt8,
   nextUint8,
