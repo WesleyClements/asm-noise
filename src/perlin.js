@@ -10,8 +10,8 @@ function Perlin(stdlib, foreign, heap) {
   function setSeed(value) {
     value = value | 0;
     var i = 0;
-    var swap = 0;
-    var temp = 0;
+    var r = 0;
+    var t = 0;
 
     _setSeed(value | 0);
 
@@ -19,10 +19,10 @@ function Perlin(stdlib, foreign, heap) {
       heapUint8[i] = i | 0;
     }
     for (i = 0; (i | 0) < 0x100; i = (i + 1) | 0) {
-      swap = nextUint8() | 0;
-      temp = heapUint8[i] | 0;
-      heapUint8[i] = heapUint8[swap] | 0;
-      heapUint8[swap] = heapUint8[temp] | 0;
+      r = nextUint8() | 0;
+      t = heapUint8[i] | 0;
+      heapUint8[i] = heapUint8[r] | 0;
+      heapUint8[r] = heapUint8[t] | 0;
     }
     for (i = 0; (i | 0) < 0x100; i = (i + 1) | 0) {
       heapUint8[(i + 0x100) | 0] = heapUint8[i] | 0;
