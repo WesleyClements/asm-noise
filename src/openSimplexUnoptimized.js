@@ -921,17 +921,1652 @@ function OpenSimplex(stdlib, foreign, heap) {
     i = (getPerm(i) | 0) ^ (wsb & pMask);
     i = getPerm(i) | 0;
     return (
-      +heapF64[(gradients2D + (i << 5) + X) >> 3] * dx +
-      +heapF64[(gradients2D + (i << 5) + Y) >> 3] * dy +
-      +heapF64[(gradients2D + (i << 5) + Z) >> 3] * dz +
-      +heapF64[(gradients2D + (i << 5) + W) >> 3] * dw
+      +heapF64[(gradients4D + (i << 5) + X) >> 3] * dx +
+      +heapF64[(gradients4D + (i << 5) + Y) >> 3] * dy +
+      +heapF64[(gradients4D + (i << 5) + Z) >> 3] * dz +
+      +heapF64[(gradients4D + (i << 5) + W) >> 3] * dw
     );
+  }
+
+  function openSimplexUnoptimized4D(x, y, z, w) {
+    x = +x;
+    y = +y;
+    z = +z;
+    w = +w;
+    var s = 0.0;
+    var xs = 0.0;
+    var ys = 0.0;
+    var zs = 0.0;
+    var ws = 0.0;
+
+    // Get points for A4 lattice
+    s = -0.138196601125011 * (x + y + z + w);
+    xs = x + s;
+    ys = y + s;
+    zs = z + s;
+    ws = w + s;
+
+    return +eval4DBase(xs, ys, zs, ws);
+  }
+
+  function eval4_XYBeforeZW(x, y, z, w) {
+    x = +x;
+    y = +y;
+    z = +z;
+    w = +w;
+    var s2 = 0.0;
+    var t2 = 0.0;
+    var xs = 0.0;
+    var ys = 0.0;
+    var zs = 0.0;
+    var ws = 0.0;
+
+    s2 = (x + y) * -0.178275657951399372 + (z + w) * 0.215623393288842828;
+    t2 = (z + w) * -0.403949762580207112 + (x + y) * -0.375199083010075342;
+    xs = x + s2;
+    ys = y + s2;
+    zs = z + t2;
+    ws = w + t2;
+
+    return +eval4DBase(xs, ys, zs, ws);
+  }
+
+  function eval4_XZBeforeYW(x, y, z, w) {
+    x = +x;
+    y = +y;
+    z = +z;
+    w = +w;
+    var s2 = 0.0;
+    var t2 = 0.0;
+    var xs = 0.0;
+    var ys = 0.0;
+    var zs = 0.0;
+    var ws = 0.0;
+
+    s2 = (x + z) * -0.178275657951399372 + (y + w) * 0.215623393288842828;
+    t2 = (y + w) * -0.403949762580207112 + (x + z) * -0.375199083010075342;
+    xs = x + s2;
+    ys = y + t2;
+    zs = z + s2;
+    ws = w + t2;
+
+    return +eval4DBase(xs, ys, zs, ws);
+  }
+
+  function eval4_XYZBeforeW(x, y, z, w) {
+    x = +x;
+    y = +y;
+    z = +z;
+    w = +w;
+    var xyz = 0.0;
+    var ww = 0.0;
+    var s2 = 0.0;
+    var xs = 0.0;
+    var ys = 0.0;
+    var zs = 0.0;
+    var ws = 0.0;
+
+    xyz = x + y + z;
+    ww = w * 0.2236067977499788;
+    s2 = xyz * -0.16666666666666666 + ww;
+    xs = x + s2;
+    ys = y + s2;
+    zs = z + s2;
+    ws = -0.5 * xyz + ww;
+
+    return +eval4DBase(xs, ys, zs, ws);
+  }
+
+  // 4D OpenSimplex Noise.
+  function eval4DBase(xs, ys, zs, ws) {
+    xs = +xs;
+    ys = +ys;
+    zs = +zs;
+    ws = +ws;
+    var value = 0.0;
+    var xsb = 0;
+    var ysb = 0;
+    var zsb = 0;
+    var wsb = 0;
+    var xins = 0.0;
+    var yins = 0.0;
+    var zins = 0.0;
+    var wins = 0.0;
+    var uins = 0.0;
+    var inSum = 0.0;
+    var squishOffsetIns = 0.0;
+    var dx0 = 0.0;
+    var dy0 = 0.0;
+    var dz0 = 0.0;
+    var dw0 = 0.0;
+    var dx1 = 0.0;
+    var dy1 = 0.0;
+    var dz1 = 0.0;
+    var dw1 = 0.0;
+    var dx2 = 0.0;
+    var dy2 = 0.0;
+    var dz2 = 0.0;
+    var dw2 = 0.0;
+    var dx3 = 0.0;
+    var dy3 = 0.0;
+    var dz3 = 0.0;
+    var dw3 = 0.0;
+    var dx4 = 0.0;
+    var dy4 = 0.0;
+    var dz4 = 0.0;
+    var dw4 = 0.0;
+    var dx5 = 0.0;
+    var dy5 = 0.0;
+    var dz5 = 0.0;
+    var dw5 = 0.0;
+    var dx6 = 0.0;
+    var dy6 = 0.0;
+    var dz6 = 0.0;
+    var dw6 = 0.0;
+    var dx7 = 0.0;
+    var dy7 = 0.0;
+    var dz7 = 0.0;
+    var dw7 = 0.0;
+    var dx8 = 0.0;
+    var dy8 = 0.0;
+    var dz8 = 0.0;
+    var dw8 = 0.0;
+    var dx9 = 0.0;
+    var dy9 = 0.0;
+    var dz9 = 0.0;
+    var dw9 = 0.0;
+    var dx10 = 0.0;
+    var dy10 = 0.0;
+    var dz10 = 0.0;
+    var dw10 = 0.0;
+
+    var attn0 = 0.0;
+    var attn1 = 0.0;
+    var attn2 = 0.0;
+    var attn3 = 0.0;
+    var attn4 = 0.0;
+    var attn5 = 0.0;
+    var attn6 = 0.0;
+    var attn7 = 0.0;
+    var attn8 = 0.0;
+    var attn9 = 0.0;
+    var attn10 = 0.0;
+
+    var dx_ext0 = 0.0;
+    var dy_ext0 = 0.0;
+    var dz_ext0 = 0.0;
+    var dw_ext0 = 0.0;
+    var dx_ext1 = 0.0;
+    var dy_ext1 = 0.0;
+    var dz_ext1 = 0.0;
+    var dw_ext1 = 0.0;
+    var dx_ext2 = 0.0;
+    var dy_ext2 = 0.0;
+    var dz_ext2 = 0.0;
+    var dw_ext2 = 0.0;
+
+    var xsv_ext0 = 0;
+    var ysv_ext0 = 0;
+    var zsv_ext0 = 0;
+    var wsv_ext0 = 0;
+    var xsv_ext1 = 0;
+    var ysv_ext1 = 0;
+    var zsv_ext1 = 0;
+    var wsv_ext1 = 0;
+    var xsv_ext2 = 0;
+    var ysv_ext2 = 0;
+    var zsv_ext2 = 0;
+    var wsv_ext2 = 0;
+
+    var attn_ext0 = 0.0;
+    var attn_ext1 = 0.0;
+    var attn_ext2 = 0.0;
+
+    var aPoint = 0;
+    var aScore = 0.0;
+    var bPoint = 0;
+    var bScore = 0.0;
+
+    var aIsBiggerSide = 0;
+    var bIsBiggerSide = 0;
+    var aIsFurtherSide = 0;
+    var bIsFurtherSide = 0;
+
+    var c = 0;
+    var c1 = 0;
+    var c2 = 0;
+    var score = 0.0;
+
+    var p1 = 0.0;
+    var p2 = 0.0;
+    var p3 = 0.0;
+    var p4 = 0.0;
+
+    // Floor to get simplectic honeycomb coordinates of rhombo-hypercube super-cell origin.
+    xsb = ~~floor(xs);
+    ysb = ~~floor(ys);
+    zsb = ~~floor(zs);
+    wsb = ~~floor(ws);
+
+    // Compute simplectic honeycomb coordinates relative to rhombo-hypercube origin.
+    xins = xs - +(xsb | 0);
+    yins = ys - +(ysb | 0);
+    zins = zs - +(zsb | 0);
+    wins = ws - +(wsb | 0);
+
+    // Sum those together to get a value that determines which region we're in.
+    inSum = xins + yins + zins + wins;
+
+    // Positions relative to origin point.
+    squishOffsetIns = inSum * heapF64[squishConstant4D >> 3];
+    dx0 = xins + squishOffsetIns;
+    dy0 = yins + squishOffsetIns;
+    dz0 = zins + squishOffsetIns;
+    dw0 = wins + squishOffsetIns;
+
+    if (inSum <= 1.0) {
+      // We're inside the pentachoron (4-Simplex) at (0,0,0,0)
+
+      // Determine which two of (0,0,0,1), (0,0,1,0), (0,1,0,0), (1,0,0,0) are closest.
+      aPoint = 0x01;
+      aScore = xins;
+      bPoint = 0x02;
+      bScore = yins;
+      if ((aScore >= bScore) & (zins > bScore)) {
+        bScore = zins;
+        bPoint = 0x04;
+      } else if ((aScore < bScore) & (zins > aScore)) {
+        aScore = zins;
+        aPoint = 0x04;
+      }
+      if ((aScore >= bScore) & (wins > bScore)) {
+        bScore = wins;
+        bPoint = 0x08;
+      } else if ((aScore < bScore) & (wins > aScore)) {
+        aScore = wins;
+        aPoint = 0x08;
+      }
+
+      // Now we determine the three lattice points not part of the pentachoron that may contribute.
+      // This depends on the closest two pentachoron vertices, including (0,0,0,0)
+      uins = 1.0 - inSum;
+      if ((uins > aScore) | (uins > bScore)) {
+        // (0,0,0,0) is one of the closest two pentachoron vertices.
+        c = bScore > aScore ? bPoint : aPoint; // Our other closest vertex is the closest out of a and b.
+        if ((c & 0x01) == 0) {
+          xsv_ext0 = (xsb - 1) | 0;
+          xsv_ext1 = xsv_ext2 = xsb;
+          dx_ext0 = dx0 + 1.0;
+          dx_ext1 = dx_ext2 = dx0;
+        } else {
+          xsv_ext0 = xsv_ext1 = xsv_ext2 = (xsb + 1) | 0;
+          dx_ext0 = dx_ext1 = dx_ext2 = dx0 - 1.0;
+        }
+
+        if ((c & 0x02) == 0) {
+          ysv_ext0 = ysv_ext1 = ysv_ext2 = ysb;
+          dy_ext0 = dy_ext1 = dy_ext2 = dy0;
+          if ((c & 0x01) == 0x01) {
+            ysv_ext0 = (ysv_ext0 - 1) | 0;
+            dy_ext0 = dy_ext0 + 1.0;
+          } else {
+            ysv_ext1 = (ysv_ext1 - 1) | 0;
+            dy_ext1 = dy_ext1 + 1.0;
+          }
+        } else {
+          ysv_ext0 = ysv_ext1 = ysv_ext2 = (ysb + 1) | 0;
+          dy_ext0 = dy_ext1 = dy_ext2 = dy0 - 1.0;
+        }
+
+        if ((c & 0x04) == 0) {
+          zsv_ext0 = zsv_ext1 = zsv_ext2 = zsb;
+          dz_ext0 = dz_ext1 = dz_ext2 = dz0;
+          if ((c & 0x03) != 0) {
+            if ((c & 0x03) == 0x03) {
+              zsv_ext0 = (zsv_ext0 - 1) | 0;
+              dz_ext0 = dz_ext0 + 1.0;
+            } else {
+              zsv_ext1 = (zsv_ext1 - 1) | 0;
+              dz_ext1 = dz_ext1 + 1.0;
+            }
+          } else {
+            zsv_ext2 = (zsv_ext2 - 1) | 0;
+            dz_ext2 = dz_ext2 + 1.0;
+          }
+        } else {
+          zsv_ext0 = zsv_ext1 = zsv_ext2 = (zsb + 1) | 0;
+          dz_ext0 = dz_ext1 = dz_ext2 = dz0 - 1.0;
+        }
+
+        if ((c & 0x08) == 0) {
+          wsv_ext0 = wsv_ext1 = wsb;
+          wsv_ext2 = (wsb - 1) | 0;
+          dw_ext0 = dw_ext1 = dw0;
+          dw_ext2 = dw0 + 1.0;
+        } else {
+          wsv_ext0 = wsv_ext1 = wsv_ext2 = (wsb + 1) | 0;
+          dw_ext0 = dw_ext1 = dw_ext2 = dw0 - 1.0;
+        }
+      } else {
+        // (0,0,0,0) is not one of the closest two pentachoron vertices.
+        c = (aPoint | bPoint) & 0xff; // Our three extra vertices are determined by the closest two.
+
+        if ((c & 0x01) == 0) {
+          xsv_ext0 = xsv_ext2 = xsb;
+          xsv_ext1 = (xsb - 1) | 0;
+          dx_ext0 = dx0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dx_ext1 = dx0 + 1.0 - +heapF64[squishConstant4D >> 3];
+          dx_ext2 = dx0 - +heapF64[squishConstant4D >> 3];
+        } else {
+          xsv_ext0 = xsv_ext1 = xsv_ext2 = (xsb + 1) | 0;
+          dx_ext0 = dx0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dx_ext1 = dx_ext2 = dx0 - 1.0 - +heapF64[squishConstant4D >> 3];
+        }
+
+        if ((c & 0x02) == 0) {
+          ysv_ext0 = ysv_ext1 = ysv_ext2 = ysb;
+          dy_ext0 = dy0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dy_ext1 = dy_ext2 = dy0 - +heapF64[squishConstant4D >> 3];
+          if ((c & 0x01) == 0x01) {
+            ysv_ext1 = (ysv_ext1 - 1) | 0;
+            dy_ext1 = dy_ext1 + 1.0;
+          } else {
+            ysv_ext2 = (ysv_ext2 - 1) | 0;
+            dy_ext2 = dy_ext2 + 1.0;
+          }
+        } else {
+          ysv_ext0 = ysv_ext1 = ysv_ext2 = (ysb + 1) | 0;
+          dy_ext0 = dy0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dy_ext1 = dy_ext2 = dy0 - 1.0 - +heapF64[squishConstant4D >> 3];
+        }
+
+        if ((c & 0x04) == 0) {
+          zsv_ext0 = zsv_ext1 = zsv_ext2 = zsb;
+          dz_ext0 = dz0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dz_ext1 = dz_ext2 = dz0 - +heapF64[squishConstant4D >> 3];
+          if ((c & 0x03) == 0x03) {
+            zsv_ext1 = (zsv_ext1 - 1) | 0;
+            dz_ext1 = dz_ext1 + 1.0;
+          } else {
+            zsv_ext2 = (zsv_ext2 - 1) | 0;
+            dz_ext2 = dz_ext2 + 1.0;
+          }
+        } else {
+          zsv_ext0 = zsv_ext1 = zsv_ext2 = (zsb + 1) | 0;
+          dz_ext0 = dz0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dz_ext1 = dz_ext2 = dz0 - 1.0 - +heapF64[squishConstant4D >> 3];
+        }
+
+        if ((c & 0x08) == 0) {
+          wsv_ext0 = wsv_ext1 = wsb;
+          wsv_ext2 = (wsb - 1) | 0;
+          dw_ext0 = dw0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dw_ext1 = dw0 - +heapF64[squishConstant4D >> 3];
+          dw_ext2 = dw0 + 1.0 - +heapF64[squishConstant4D >> 3];
+        } else {
+          wsv_ext0 = wsv_ext1 = wsv_ext2 = (wsb + 1) | 0;
+          dw_ext0 = dw0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dw_ext1 = dw_ext2 = dw0 - 1.0 - +heapF64[squishConstant4D >> 3];
+        }
+      }
+
+      // Contribution (0,0,0,0)
+      attn0 = 2.0 - dx0 * dx0 - dy0 * dy0 - dz0 * dz0 - dw0 * dw0;
+      if (attn0 > 0.0) {
+        attn0 = attn0 * attn0;
+        value =
+          value +
+          attn0 *
+            attn0 *
+            +extrapolate4D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 0) | 0, (wsb + 0) | 0, dx0, dy0, dz0, dw0);
+      }
+
+      // Contribution (1,0,0,0)
+      dx1 = dx0 - 1.0 - +heapF64[squishConstant4D >> 3];
+      dy1 = dy0 - 0.0 - +heapF64[squishConstant4D >> 3];
+      dz1 = dz0 - 0.0 - +heapF64[squishConstant4D >> 3];
+      dw1 = dw0 - 0.0 - +heapF64[squishConstant4D >> 3];
+      attn1 = 2.0 - dx1 * dx1 - dy1 * dy1 - dz1 * dz1 - dw1 * dw1;
+      if (attn1 > 0.0) {
+        attn1 = attn1 * attn1;
+        value =
+          value +
+          attn1 *
+            attn1 *
+            +extrapolate4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 0) | 0, (wsb + 0) | 0, dx1, dy1, dz1, dw1);
+      }
+
+      // Contribution (0,1,0,0)
+      dx2 = dx0 - 0.0 - +heapF64[squishConstant4D >> 3];
+      dy2 = dy0 - 1.0 - +heapF64[squishConstant4D >> 3];
+      dz2 = dz1;
+      dw2 = dw1;
+      attn2 = 2.0 - dx2 * dx2 - dy2 * dy2 - dz2 * dz2 - dw2 * dw2;
+      if (attn2 > 0.0) {
+        attn2 = attn2 * attn2;
+        value =
+          value +
+          attn2 *
+            attn2 *
+            +extrapolate4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 0) | 0, dx2, dy2, dz2, dw2);
+      }
+
+      // Contribution (0,0,1,0)
+      dx3 = dx2;
+      dy3 = dy1;
+      dz3 = dz0 - 1.0 - +heapF64[squishConstant4D >> 3];
+      dw3 = dw1;
+      attn3 = 2.0 - dx3 * dx3 - dy3 * dy3 - dz3 * dz3 - dw3 * dw3;
+      if (attn3 > 0.0) {
+        attn3 = attn3 * attn3;
+        value =
+          value +
+          attn3 *
+            attn3 *
+            +extrapolate4D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx3, dy3, dz3, dw3);
+      }
+
+      // Contribution (0,0,0,1)
+      dx4 = dx2;
+      dy4 = dy1;
+      dz4 = dz1;
+      dw4 = dw0 - 1.0 - +heapF64[squishConstant4D >> 3];
+      attn4 = 2.0 - dx4 * dx4 - dy4 * dy4 - dz4 * dz4 - dw4 * dw4;
+      if (attn4 > 0.0) {
+        attn4 = attn4 * attn4;
+        value =
+          value +
+          attn4 *
+            attn4 *
+            +extrapolate4D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx4, dy4, dz4, dw4);
+      }
+    } else if (inSum >= 3.0) {
+      // We're inside the pentachoron (4-Simplex) at (1,1,1,1)
+      // Determine which two of (1,1,1,0), (1,1,0,1), (1,0,1,1), (0,1,1,1) are closest.
+      aPoint = 0x0e;
+      aScore = xins;
+      bPoint = 0x0d;
+      bScore = yins;
+      if ((aScore <= bScore) & (zins < bScore)) {
+        bScore = zins;
+        bPoint = 0x0b;
+      } else if ((aScore > bScore) & (zins < aScore)) {
+        aScore = zins;
+        aPoint = 0x0b;
+      }
+      if ((aScore <= bScore) & (wins < bScore)) {
+        bScore = wins;
+        bPoint = 0x07;
+      } else if ((aScore > bScore) & (wins < aScore)) {
+        aScore = wins;
+        aPoint = 0x07;
+      }
+
+      // Now we determine the three lattice points not part of the pentachoron that may contribute.
+      // This depends on the closest two pentachoron vertices, including (0,0,0,0)
+      uins = 4.0 - inSum;
+      if ((uins < aScore) | (uins < bScore)) {
+        // (1,1,1,1) is one of the closest two pentachoron vertices.
+        c = bScore < aScore ? bPoint : aPoint; // Our other closest vertex is the closest out of a and b.
+
+        if ((c & 0x01) != 0) {
+          xsv_ext0 = (xsb + 2) | 0;
+          xsv_ext1 = xsv_ext2 = (xsb + 1) | 0;
+          dx_ext0 = dx0 - 2.0 - 4.0 * heapF64[squishConstant4D >> 3];
+          dx_ext1 = dx_ext2 = dx0 - 1.0 - 4.0 * heapF64[squishConstant4D >> 3];
+        } else {
+          xsv_ext0 = xsv_ext1 = xsv_ext2 = xsb;
+          dx_ext0 = dx_ext1 = dx_ext2 = dx0 - 4.0 * heapF64[squishConstant4D >> 3];
+        }
+
+        if ((c & 0x02) != 0) {
+          ysv_ext0 = ysv_ext1 = ysv_ext2 = (ysb + 1) | 0;
+          dy_ext0 = dy_ext1 = dy_ext2 = dy0 - 1.0 - 4.0 * heapF64[squishConstant4D >> 3];
+          if ((c & 0x01) != 0) {
+            ysv_ext1 = (ysv_ext1 + 1) | 0;
+            dy_ext1 = dy_ext1 - 1.0;
+          } else {
+            ysv_ext0 = (ysv_ext0 + 1) | 0;
+            dy_ext0 = dy_ext0 - 1.0;
+          }
+        } else {
+          ysv_ext0 = ysv_ext1 = ysv_ext2 = ysb;
+          dy_ext0 = dy_ext1 = dy_ext2 = dy0 - 4.0 * heapF64[squishConstant4D >> 3];
+        }
+
+        if ((c & 0x04) != 0) {
+          zsv_ext0 = zsv_ext1 = zsv_ext2 = (zsb + 1) | 0;
+          dz_ext0 = dz_ext1 = dz_ext2 = dz0 - 1.0 - 4.0 * heapF64[squishConstant4D >> 3];
+          if ((c & 0x03) != 0x03) {
+            if ((c & 0x03) == 0) {
+              zsv_ext0 = (zsv_ext0 + 1) | 0;
+              dz_ext0 = dz_ext0 - 1.0;
+            } else {
+              zsv_ext1 = (zsv_ext1 + 1) | 0;
+              dz_ext1 = dz_ext1 - 1.0;
+            }
+          } else {
+            zsv_ext2 = (zsv_ext2 + 1) | 0;
+            dz_ext2 = dz_ext2 - 1.0;
+          }
+        } else {
+          zsv_ext0 = zsv_ext1 = zsv_ext2 = zsb;
+          dz_ext0 = dz_ext1 = dz_ext2 = dz0 - 4.0 * heapF64[squishConstant4D >> 3];
+        }
+
+        if ((c & 0x08) != 0) {
+          wsv_ext0 = wsv_ext1 = (wsb + 1) | 0;
+          wsv_ext2 = (wsb + 2) | 0;
+          dw_ext0 = dw_ext1 = dw0 - 1.0 - 4.0 * heapF64[squishConstant4D >> 3];
+          dw_ext2 = dw0 - 2.0 - 4.0 * heapF64[squishConstant4D >> 3];
+        } else {
+          wsv_ext0 = wsv_ext1 = wsv_ext2 = wsb;
+          dw_ext0 = dw_ext1 = dw_ext2 = dw0 - 4.0 * heapF64[squishConstant4D >> 3];
+        }
+      } else {
+        // (1,1,1,1) is not one of the closest two pentachoron vertices.
+        c = aPoint & bPoint & 0xff; // Our three extra vertices are determined by the closest two.
+
+        if ((c & 0x01) != 0) {
+          xsv_ext0 = xsv_ext2 = (xsb + 1) | 0;
+          xsv_ext1 = (xsb + 2) | 0;
+          dx_ext0 = dx0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dx_ext1 = dx0 - 2.0 - 3.0 * heapF64[squishConstant4D >> 3];
+          dx_ext2 = dx0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+        } else {
+          xsv_ext0 = xsv_ext1 = xsv_ext2 = xsb;
+          dx_ext0 = dx0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dx_ext1 = dx_ext2 = dx0 - 3.0 * heapF64[squishConstant4D >> 3];
+        }
+
+        if ((c & 0x02) != 0) {
+          ysv_ext0 = ysv_ext1 = ysv_ext2 = (ysb + 1) | 0;
+          dy_ext0 = dy0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dy_ext1 = dy_ext2 = dy0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+          if ((c & 0x01) != 0) {
+            ysv_ext2 = (ysv_ext2 + 1) | 0;
+            dy_ext2 = dy_ext2 - 1.0;
+          } else {
+            ysv_ext1 = (ysv_ext1 + 1) | 0;
+            dy_ext1 = dy_ext1 - 1.0;
+          }
+        } else {
+          ysv_ext0 = ysv_ext1 = ysv_ext2 = ysb;
+          dy_ext0 = dy0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dy_ext1 = dy_ext2 = dy0 - 3.0 * heapF64[squishConstant4D >> 3];
+        }
+
+        if ((c & 0x04) != 0) {
+          zsv_ext0 = zsv_ext1 = zsv_ext2 = (zsb + 1) | 0;
+          dz_ext0 = dz0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dz_ext1 = dz_ext2 = dz0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+          if ((c & 0x03) != 0) {
+            zsv_ext2 = (zsv_ext2 + 1) | 0;
+            dz_ext2 = dz_ext2 - 1.0;
+          } else {
+            zsv_ext1 = (zsv_ext1 + 1) | 0;
+            dz_ext1 = dz_ext1 - 1.0;
+          }
+        } else {
+          zsv_ext0 = zsv_ext1 = zsv_ext2 = zsb;
+          dz_ext0 = dz0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dz_ext1 = dz_ext2 = dz0 - 3.0 * heapF64[squishConstant4D >> 3];
+        }
+
+        if ((c & 0x08) != 0) {
+          wsv_ext0 = wsv_ext1 = (wsb + 1) | 0;
+          wsv_ext2 = (wsb + 2) | 0;
+          dw_ext0 = dw0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dw_ext1 = dw0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+          dw_ext2 = dw0 - 2.0 - 3.0 * heapF64[squishConstant4D >> 3];
+        } else {
+          wsv_ext0 = wsv_ext1 = wsv_ext2 = wsb;
+          dw_ext0 = dw0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dw_ext1 = dw_ext2 = dw0 - 3.0 * heapF64[squishConstant4D >> 3];
+        }
+      }
+
+      // Contribution (1,1,1,0)
+      dx4 = dx0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+      dy4 = dy0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+      dz4 = dz0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+      dw4 = dw0 - 3.0 * heapF64[squishConstant4D >> 3];
+      attn4 = 2.0 - dx4 * dx4 - dy4 * dy4 - dz4 * dz4 - dw4 * dw4;
+      if (attn4 > 0.0) {
+        attn4 = attn4 * attn4;
+        value =
+          value +
+          attn4 *
+            attn4 *
+            +extrapolate4D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx4, dy4, dz4, dw4);
+      }
+
+      // Contribution (1,1,0,1)
+      dx3 = dx4;
+      dy3 = dy4;
+      dz3 = dz0 - 3.0 * heapF64[squishConstant4D >> 3];
+      dw3 = dw0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+      attn3 = 2.0 - dx3 * dx3 - dy3 * dy3 - dz3 * dz3 - dw3 * dw3;
+      if (attn3 > 0.0) {
+        attn3 = attn3 * attn3;
+        value =
+          value +
+          attn3 *
+            attn3 *
+            +extrapolate4D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx3, dy3, dz3, dw3);
+      }
+
+      // Contribution (1,0,1,1)
+      dx2 = dx4;
+      dy2 = dy0 - 3.0 * heapF64[squishConstant4D >> 3];
+      dz2 = dz4;
+      dw2 = dw3;
+      attn2 = 2.0 - dx2 * dx2 - dy2 * dy2 - dz2 * dz2 - dw2 * dw2;
+      if (attn2 > 0.0) {
+        attn2 = attn2 * attn2;
+        value =
+          value +
+          attn2 *
+            attn2 *
+            +extrapolate4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 1) | 0, dx2, dy2, dz2, dw2);
+      }
+
+      // Contribution (0,1,1,1)
+      dx1 = dx0 - 3.0 * heapF64[squishConstant4D >> 3];
+      dz1 = dz4;
+      dy1 = dy4;
+      dw1 = dw3;
+      attn1 = 2.0 - dx1 * dx1 - dy1 * dy1 - dz1 * dz1 - dw1 * dw1;
+      if (attn1 > 0.0) {
+        attn1 = attn1 * attn1;
+        value =
+          value +
+          attn1 *
+            attn1 *
+            +extrapolate4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 1) | 0, (wsb + 1) | 0, dx1, dy1, dz1, dw1);
+      }
+
+      // Contribution (1,1,1,1)
+      dx0 = dx0 - 1.0 - 4.0 * heapF64[squishConstant4D >> 3];
+      dy0 = dy0 - 1.0 - 4.0 * heapF64[squishConstant4D >> 3];
+      dz0 = dz0 - 1.0 - 4.0 * heapF64[squishConstant4D >> 3];
+      dw0 = dw0 - 1.0 - 4.0 * heapF64[squishConstant4D >> 3];
+      attn0 = 2.0 - dx0 * dx0 - dy0 * dy0 - dz0 * dz0 - dw0 * dw0;
+      if (attn0 > 0.0) {
+        attn0 = attn0 * attn0;
+        value =
+          value +
+          attn0 *
+            attn0 *
+            +extrapolate4D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 1) | 0, (wsb + 1) | 0, dx0, dy0, dz0, dw0);
+      }
+    } else if (inSum <= 2.0) {
+      // We're inside the first dispentachoron (Rectified 4-Simplex)
+      aIsBiggerSide = 1;
+      bIsBiggerSide = 1;
+
+      // Decide between (1,1,0,0) and (0,0,1,1)
+      if (xins + yins > zins + wins) {
+        aScore = xins + yins;
+        aPoint = 0x03;
+      } else {
+        aScore = zins + wins;
+        aPoint = 0x0c;
+      }
+
+      // Decide between (1,0,1,0) and (0,1,0,1)
+      if (xins + zins > yins + wins) {
+        bScore = xins + zins;
+        bPoint = 0x05;
+      } else {
+        bScore = yins + wins;
+        bPoint = 0x0a;
+      }
+
+      // Closer between (1,0,0,1) and (0,1,1,0) will replace the further of a and b, if closer.
+      if (xins + wins > yins + zins) {
+        score = xins + wins;
+        if ((aScore >= bScore) & (score > bScore)) {
+          bScore = score;
+          bPoint = 0x09;
+        } else if ((aScore < bScore) & (score > aScore)) {
+          aScore = score;
+          aPoint = 0x09;
+        }
+      } else {
+        score = yins + zins;
+        if ((aScore >= bScore) & (score > bScore)) {
+          bScore = score;
+          bPoint = 0x06;
+        } else if ((aScore < bScore) & (score > aScore)) {
+          aScore = score;
+          aPoint = 0x06;
+        }
+      }
+
+      // Decide if (1,0,0,0) is closer.
+      p1 = 2.0 - inSum + xins;
+      if ((aScore >= bScore) & (p1 > bScore)) {
+        bScore = p1;
+        bPoint = 0x01;
+        bIsBiggerSide = 0;
+      } else if ((aScore < bScore) & (p1 > aScore)) {
+        aScore = p1;
+        aPoint = 0x01;
+        aIsBiggerSide = 0;
+      }
+
+      // Decide if (0,1,0,0) is closer.
+      p2 = 2.0 - inSum + yins;
+      if ((aScore >= bScore) & (p2 > bScore)) {
+        bScore = p2;
+        bPoint = 0x02;
+        bIsBiggerSide = 0;
+      } else if ((aScore < bScore) & (p2 > aScore)) {
+        aScore = p2;
+        aPoint = 0x02;
+        aIsBiggerSide = 0;
+      }
+
+      // Decide if (0,0,1,0) is closer.
+      p3 = 2.0 - inSum + zins;
+      if ((aScore >= bScore) & (p3 > bScore)) {
+        bScore = p3;
+        bPoint = 0x04;
+        bIsBiggerSide = 0;
+      } else if ((aScore < bScore) & (p3 > aScore)) {
+        aScore = p3;
+        aPoint = 0x04;
+        aIsBiggerSide = 0;
+      }
+
+      // Decide if (0,0,0,1) is closer.
+      p4 = 2.0 - inSum + wins;
+      if ((aScore >= bScore) & (p4 > bScore)) {
+        bScore = p4;
+        bPoint = 0x08;
+        bIsBiggerSide = 0;
+      } else if ((aScore < bScore) & (p4 > aScore)) {
+        aScore = p4;
+        aPoint = 0x08;
+        aIsBiggerSide = 0;
+      }
+
+      // Where each of the two closest points are determines how the extra three vertices are calculated.
+      if ((aIsBiggerSide | 0) == (bIsBiggerSide | 0)) {
+        if (aIsBiggerSide) {
+          // Both closest points on the bigger side
+          c1 = (aPoint | bPoint) & 0xff;
+          c2 = aPoint & bPoint & 0xff;
+          if ((c1 & 0x01) == 0) {
+            xsv_ext0 = xsb;
+            xsv_ext1 = (xsb - 1) | 0;
+            dx_ext0 = dx0 - 3.0 * heapF64[squishConstant4D >> 3];
+            dx_ext1 = dx0 + 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+          } else {
+            xsv_ext0 = xsv_ext1 = (xsb + 1) | 0;
+            dx_ext0 = dx0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+            dx_ext1 = dx0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+          }
+
+          if ((c1 & 0x02) == 0) {
+            ysv_ext0 = ysb;
+            ysv_ext1 = (ysb - 1) | 0;
+            dy_ext0 = dy0 - 3.0 * heapF64[squishConstant4D >> 3];
+            dy_ext1 = dy0 + 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+          } else {
+            ysv_ext0 = ysv_ext1 = (ysb + 1) | 0;
+            dy_ext0 = dy0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+            dy_ext1 = dy0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+          }
+
+          if ((c1 & 0x04) == 0) {
+            zsv_ext0 = zsb;
+            zsv_ext1 = (zsb - 1) | 0;
+            dz_ext0 = dz0 - 3.0 * heapF64[squishConstant4D >> 3];
+            dz_ext1 = dz0 + 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+          } else {
+            zsv_ext0 = zsv_ext1 = (zsb + 1) | 0;
+            dz_ext0 = dz0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+            dz_ext1 = dz0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+          }
+
+          if ((c1 & 0x08) == 0) {
+            wsv_ext0 = wsb;
+            wsv_ext1 = (wsb - 1) | 0;
+            dw_ext0 = dw0 - 3.0 * heapF64[squishConstant4D >> 3];
+            dw_ext1 = dw0 + 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+          } else {
+            wsv_ext0 = wsv_ext1 = (wsb + 1) | 0;
+            dw_ext0 = dw0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+            dw_ext1 = dw0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+          }
+
+          // One combination is a permutation of (0,0,0,2) based on c2
+          xsv_ext2 = xsb;
+          ysv_ext2 = ysb;
+          zsv_ext2 = zsb;
+          wsv_ext2 = wsb;
+          dx_ext2 = dx0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dy_ext2 = dy0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dz_ext2 = dz0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dw_ext2 = dw0 - 2.0 * heapF64[squishConstant4D >> 3];
+          if ((c2 & 0x01) != 0) {
+            xsv_ext2 = (xsv_ext2 + 2) | 0;
+            dx_ext2 = dx_ext2 - 2.0;
+          } else if ((c2 & 0x02) != 0) {
+            ysv_ext2 = (ysv_ext2 + 2) | 0;
+            dy_ext2 = dy_ext2 - 2.0;
+          } else if ((c2 & 0x04) != 0) {
+            zsv_ext2 = (zsv_ext2 + 2) | 0;
+            dz_ext2 = dz_ext2 - 2.0;
+          } else {
+            wsv_ext2 = (wsv_ext2 + 2) | 0;
+            dw_ext2 = dw_ext2 - 2.0;
+          }
+        } else {
+          // Both closest points on the smaller side
+          // One of the two extra points is (0,0,0,0)
+          xsv_ext2 = xsb;
+          ysv_ext2 = ysb;
+          zsv_ext2 = zsb;
+          wsv_ext2 = wsb;
+          dx_ext2 = dx0;
+          dy_ext2 = dy0;
+          dz_ext2 = dz0;
+          dw_ext2 = dw0;
+
+          // Other two points are based on the omitted axes.
+          c = (aPoint | bPoint) & 0xff;
+
+          if ((c & 0x01) == 0) {
+            xsv_ext0 = (xsb - 1) | 0;
+            xsv_ext1 = xsb;
+            dx_ext0 = dx0 + 1.0 - +heapF64[squishConstant4D >> 3];
+            dx_ext1 = dx0 - +heapF64[squishConstant4D >> 3];
+          } else {
+            xsv_ext0 = xsv_ext1 = (xsb + 1) | 0;
+            dx_ext0 = dx_ext1 = dx0 - 1.0 - +heapF64[squishConstant4D >> 3];
+          }
+
+          if ((c & 0x02) == 0) {
+            ysv_ext0 = ysv_ext1 = ysb;
+            dy_ext0 = dy_ext1 = dy0 - +heapF64[squishConstant4D >> 3];
+            if ((c & 0x01) == 0x01) {
+              ysv_ext0 = (ysv_ext0 - 1) | 0;
+              dy_ext0 = dy_ext0 + 1.0;
+            } else {
+              ysv_ext1 = (ysv_ext1 - 1) | 0;
+              dy_ext1 = dy_ext1 + 1.0;
+            }
+          } else {
+            ysv_ext0 = ysv_ext1 = (ysb + 1) | 0;
+            dy_ext0 = dy_ext1 = dy0 - 1.0 - +heapF64[squishConstant4D >> 3];
+          }
+
+          if ((c & 0x04) == 0) {
+            zsv_ext0 = zsv_ext1 = zsb;
+            dz_ext0 = dz_ext1 = dz0 - +heapF64[squishConstant4D >> 3];
+            if ((c & 0x03) == 0x03) {
+              zsv_ext0 = (zsv_ext0 - 1) | 0;
+              dz_ext0 = dz_ext0 + 1.0;
+            } else {
+              zsv_ext1 = (zsv_ext1 - 1) | 0;
+              dz_ext1 = dz_ext1 + 1.0;
+            }
+          } else {
+            zsv_ext0 = zsv_ext1 = (zsb + 1) | 0;
+            dz_ext0 = dz_ext1 = dz0 - 1.0 - +heapF64[squishConstant4D >> 3];
+          }
+
+          if ((c & 0x08) == 0) {
+            wsv_ext0 = wsb;
+            wsv_ext1 = (wsb - 1) | 0;
+            dw_ext0 = dw0 - +heapF64[squishConstant4D >> 3];
+            dw_ext1 = dw0 + 1.0 - +heapF64[squishConstant4D >> 3];
+          } else {
+            wsv_ext0 = wsv_ext1 = (wsb + 1) | 0;
+            dw_ext0 = dw_ext1 = dw0 - 1.0 - +heapF64[squishConstant4D >> 3];
+          }
+        }
+      } else {
+        // One point on each "side"
+        c1, c2;
+        if (aIsBiggerSide) {
+          c1 = aPoint;
+          c2 = bPoint;
+        } else {
+          c1 = bPoint;
+          c2 = aPoint;
+        }
+
+        // Two contributions are the bigger-sided point with each 0 replaced with -1.
+        if ((c1 & 0x01) == 0) {
+          xsv_ext0 = (xsb - 1) | 0;
+          xsv_ext1 = xsb;
+          dx_ext0 = dx0 + 1.0 - +heapF64[squishConstant4D >> 3];
+          dx_ext1 = dx0 - +heapF64[squishConstant4D >> 3];
+        } else {
+          xsv_ext0 = xsv_ext1 = (xsb + 1) | 0;
+          dx_ext0 = dx_ext1 = dx0 - 1.0 - +heapF64[squishConstant4D >> 3];
+        }
+
+        if ((c1 & 0x02) == 0) {
+          ysv_ext0 = ysv_ext1 = ysb;
+          dy_ext0 = dy_ext1 = dy0 - +heapF64[squishConstant4D >> 3];
+          if ((c1 & 0x01) == 0x01) {
+            ysv_ext0 = (ysv_ext0 - 1) | 0;
+            dy_ext0 = dy_ext0 + 1.0;
+          } else {
+            ysv_ext1 = (ysv_ext1 - 1) | 0;
+            dy_ext1 = dy_ext1 + 1.0;
+          }
+        } else {
+          ysv_ext0 = ysv_ext1 = (ysb + 1) | 0;
+          dy_ext0 = dy_ext1 = dy0 - 1.0 - +heapF64[squishConstant4D >> 3];
+        }
+
+        if ((c1 & 0x04) == 0) {
+          zsv_ext0 = zsv_ext1 = zsb;
+          dz_ext0 = dz_ext1 = dz0 - +heapF64[squishConstant4D >> 3];
+          if ((c1 & 0x03) == 0x03) {
+            zsv_ext0 = (zsv_ext0 - 1) | 0;
+            dz_ext0 = dz_ext0 + 1.0;
+          } else {
+            zsv_ext1 = (zsv_ext1 - 1) | 0;
+            dz_ext1 = dz_ext1 + 1.0;
+          }
+        } else {
+          zsv_ext0 = zsv_ext1 = (zsb + 1) | 0;
+          dz_ext0 = dz_ext1 = dz0 - 1.0 - +heapF64[squishConstant4D >> 3];
+        }
+
+        if ((c1 & 0x08) == 0) {
+          wsv_ext0 = wsb;
+          wsv_ext1 = (wsb - 1) | 0;
+          dw_ext0 = dw0 - +heapF64[squishConstant4D >> 3];
+          dw_ext1 = dw0 + 1.0 - +heapF64[squishConstant4D >> 3];
+        } else {
+          wsv_ext0 = wsv_ext1 = (wsb + 1) | 0;
+          dw_ext0 = dw_ext1 = dw0 - 1.0 - +heapF64[squishConstant4D >> 3];
+        }
+
+        // One contribution is a permutation of (0,0,0,2) based on the smaller-sided point
+        xsv_ext2 = xsb;
+        ysv_ext2 = ysb;
+        zsv_ext2 = zsb;
+        wsv_ext2 = wsb;
+        dx_ext2 = dx0 - 2.0 * heapF64[squishConstant4D >> 3];
+        dy_ext2 = dy0 - 2.0 * heapF64[squishConstant4D >> 3];
+        dz_ext2 = dz0 - 2.0 * heapF64[squishConstant4D >> 3];
+        dw_ext2 = dw0 - 2.0 * heapF64[squishConstant4D >> 3];
+        if ((c2 & 0x01) != 0) {
+          xsv_ext2 = (xsv_ext2 + 2) | 0;
+          dx_ext2 = dx_ext2 - 2.0;
+        } else if ((c2 & 0x02) != 0) {
+          ysv_ext2 = (ysv_ext2 + 2) | 0;
+          dy_ext2 = dy_ext2 - 2.0;
+        } else if ((c2 & 0x04) != 0) {
+          zsv_ext2 = (zsv_ext2 + 2) | 0;
+          dz_ext2 = dz_ext2 - 2.0;
+        } else {
+          wsv_ext2 = (wsv_ext2 + 2) | 0;
+          dw_ext2 = dw_ext2 - 2.0;
+        }
+      }
+
+      // Contribution (1,0,0,0)
+      dx1 = dx0 - 1.0 - +heapF64[squishConstant4D >> 3];
+      dy1 = dy0 - 0.0 - +heapF64[squishConstant4D >> 3];
+      dz1 = dz0 - 0.0 - +heapF64[squishConstant4D >> 3];
+      dw1 = dw0 - 0.0 - +heapF64[squishConstant4D >> 3];
+      attn1 = 2.0 - dx1 * dx1 - dy1 * dy1 - dz1 * dz1 - dw1 * dw1;
+      if (attn1 > 0.0) {
+        attn1 = attn1 * attn1;
+        value =
+          value +
+          attn1 *
+            attn1 *
+            +extrapolate4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 0) | 0, (wsb + 0) | 0, dx1, dy1, dz1, dw1);
+      }
+
+      // Contribution (0,1,0,0)
+      dx2 = dx0 - 0.0 - +heapF64[squishConstant4D >> 3];
+      dy2 = dy0 - 1.0 - +heapF64[squishConstant4D >> 3];
+      dz2 = dz1;
+      dw2 = dw1;
+      attn2 = 2.0 - dx2 * dx2 - dy2 * dy2 - dz2 * dz2 - dw2 * dw2;
+      if (attn2 > 0.0) {
+        attn2 = attn2 * attn2;
+        value =
+          value +
+          attn2 *
+            attn2 *
+            +extrapolate4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 0) | 0, dx2, dy2, dz2, dw2);
+      }
+
+      // Contribution (0,0,1,0)
+      dx3 = dx2;
+      dy3 = dy1;
+      dz3 = dz0 - 1.0 - +heapF64[squishConstant4D >> 3];
+      dw3 = dw1;
+      attn3 = 2.0 - dx3 * dx3 - dy3 * dy3 - dz3 * dz3 - dw3 * dw3;
+      if (attn3 > 0.0) {
+        attn3 = attn3 * attn3;
+        value =
+          value +
+          attn3 *
+            attn3 *
+            +extrapolate4D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx3, dy3, dz3, dw3);
+      }
+
+      // Contribution (0,0,0,1)
+      dx4 = dx2;
+      dy4 = dy1;
+      dz4 = dz1;
+      dw4 = dw0 - 1.0 - +heapF64[squishConstant4D >> 3];
+      attn4 = 2.0 - dx4 * dx4 - dy4 * dy4 - dz4 * dz4 - dw4 * dw4;
+      if (attn4 > 0.0) {
+        attn4 = attn4 * attn4;
+        value =
+          value +
+          attn4 *
+            attn4 *
+            +extrapolate4D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx4, dy4, dz4, dw4);
+      }
+
+      // Contribution (1,1,0,0)
+      dx5 = dx0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dy5 = dy0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dz5 = dz0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dw5 = dw0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      attn5 = 2.0 - dx5 * dx5 - dy5 * dy5 - dz5 * dz5 - dw5 * dw5;
+      if (attn5 > 0.0) {
+        attn5 = attn5 * attn5;
+        value =
+          value +
+          attn5 *
+            attn5 *
+            +extrapolate4D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 0) | 0, dx5, dy5, dz5, dw5);
+      }
+
+      // Contribution (1,0,1,0)
+      dx6 = dx0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dy6 = dy0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dz6 = dz0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dw6 = dw0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      attn6 = 2.0 - dx6 * dx6 - dy6 * dy6 - dz6 * dz6 - dw6 * dw6;
+      if (attn6 > 0.0) {
+        attn6 = attn6 * attn6;
+        value =
+          value +
+          attn6 *
+            attn6 *
+            +extrapolate4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx6, dy6, dz6, dw6);
+      }
+
+      // Contribution (1,0,0,1)
+      dx7 = dx0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dy7 = dy0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dz7 = dz0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dw7 = dw0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      attn7 = 2.0 - dx7 * dx7 - dy7 * dy7 - dz7 * dz7 - dw7 * dw7;
+      if (attn7 > 0.0) {
+        attn7 = attn7 * attn7;
+        value =
+          value +
+          attn7 *
+            attn7 *
+            +extrapolate4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx7, dy7, dz7, dw7);
+      }
+
+      // Contribution (0,1,1,0)
+      dx8 = dx0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dy8 = dy0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dz8 = dz0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dw8 = dw0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      attn8 = 2.0 - dx8 * dx8 - dy8 * dy8 - dz8 * dz8 - dw8 * dw8;
+      if (attn8 > 0.0) {
+        attn8 = attn8 * attn8;
+        value =
+          value +
+          attn8 *
+            attn8 *
+            +extrapolate4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx8, dy8, dz8, dw8);
+      }
+
+      // Contribution (0,1,0,1)
+      dx9 = dx0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dy9 = dy0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dz9 = dz0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dw9 = dw0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      attn9 = 2.0 - dx9 * dx9 - dy9 * dy9 - dz9 * dz9 - dw9 * dw9;
+      if (attn9 > 0.0) {
+        attn9 = attn9 * attn9;
+        value =
+          value +
+          attn9 *
+            attn9 *
+            +extrapolate4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx9, dy9, dz9, dw9);
+      }
+
+      // Contribution (0,0,1,1)
+      dx10 = dx0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dy10 = dy0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dz10 = dz0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dw10 = dw0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      attn10 = 2.0 - dx10 * dx10 - dy10 * dy10 - dz10 * dz10 - dw10 * dw10;
+      if (attn10 > 0.0) {
+        attn10 = attn10 * attn10;
+        value =
+          value +
+          attn10 *
+            attn10 *
+            +extrapolate4D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 1) | 0, dx10, dy10, dz10, dw10);
+      }
+    } else {
+      // We're inside the second dispentachoron (Rectified 4-Simplex)
+      aScore;
+      aPoint;
+      aIsBiggerSide = 1;
+      bScore;
+      bPoint;
+      bIsBiggerSide = 1;
+
+      // Decide between (0,0,1,1) and (1,1,0,0)
+      if (xins + yins < zins + wins) {
+        aScore = xins + yins;
+        aPoint = 0x0c;
+      } else {
+        aScore = zins + wins;
+        aPoint = 0x03;
+      }
+
+      // Decide between (0,1,0,1) and (1,0,1,0)
+      if (xins + zins < yins + wins) {
+        bScore = xins + zins;
+        bPoint = 0x0a;
+      } else {
+        bScore = yins + wins;
+        bPoint = 0x05;
+      }
+
+      // Closer between (0,1,1,0) and (1,0,0,1) will replace the further of a and b, if closer.
+      if (xins + wins < yins + zins) {
+        score = xins + wins;
+        if ((aScore <= bScore) & (score < bScore)) {
+          bScore = score;
+          bPoint = 0x06;
+        } else if ((aScore > bScore) & (score < aScore)) {
+          aScore = score;
+          aPoint = 0x06;
+        }
+      } else {
+        score = yins + zins;
+        if ((aScore <= bScore) & (score < bScore)) {
+          bScore = score;
+          bPoint = 0x09;
+        } else if ((aScore > bScore) & (score < aScore)) {
+          aScore = score;
+          aPoint = 0x09;
+        }
+      }
+
+      // Decide if (0,1,1,1) is closer.
+      p1 = 3.0 - inSum + xins;
+      if ((aScore <= bScore) & (p1 < bScore)) {
+        bScore = p1;
+        bPoint = 0x0e;
+        bIsBiggerSide = 0;
+      } else if ((aScore > bScore) & (p1 < aScore)) {
+        aScore = p1;
+        aPoint = 0x0e;
+        aIsBiggerSide = 0;
+      }
+
+      // Decide if (1,0,1,1) is closer.
+      p2 = 3.0 - inSum + yins;
+      if ((aScore <= bScore) & (p2 < bScore)) {
+        bScore = p2;
+        bPoint = 0x0d;
+        bIsBiggerSide = 0;
+      } else if ((aScore > bScore) & (p2 < aScore)) {
+        aScore = p2;
+        aPoint = 0x0d;
+        aIsBiggerSide = 0;
+      }
+
+      // Decide if (1,1,0,1) is closer.
+      p3 = 3.0 - inSum + zins;
+      if ((aScore <= bScore) & (p3 < bScore)) {
+        bScore = p3;
+        bPoint = 0x0b;
+        bIsBiggerSide = 0;
+      } else if ((aScore > bScore) & (p3 < aScore)) {
+        aScore = p3;
+        aPoint = 0x0b;
+        aIsBiggerSide = 0;
+      }
+
+      // Decide if (1,1,1,0) is closer.
+      p4 = 3.0 - inSum + wins;
+      if ((aScore <= bScore) & (p4 < bScore)) {
+        bScore = p4;
+        bPoint = 0x07;
+        bIsBiggerSide = 0;
+      } else if ((aScore > bScore) & (p4 < aScore)) {
+        aScore = p4;
+        aPoint = 0x07;
+        aIsBiggerSide = 0;
+      }
+
+      // Where each of the two closest points are determines how the extra three vertices are calculated.
+      if ((aIsBiggerSide | 0) == (bIsBiggerSide | 0)) {
+        if (aIsBiggerSide) {
+          // Both closest points on the bigger side
+          c1 = aPoint & bPoint & 0xff;
+          c2 = (aPoint | bPoint) & 0xff;
+
+          // Two contributions are permutations of (0,0,0,1) and (0,0,0,2) based on c1
+          xsv_ext0 = xsv_ext1 = xsb;
+          ysv_ext0 = ysv_ext1 = ysb;
+          zsv_ext0 = zsv_ext1 = zsb;
+          wsv_ext0 = wsv_ext1 = wsb;
+          dx_ext0 = dx0 - +heapF64[squishConstant4D >> 3];
+          dy_ext0 = dy0 - +heapF64[squishConstant4D >> 3];
+          dz_ext0 = dz0 - +heapF64[squishConstant4D >> 3];
+          dw_ext0 = dw0 - +heapF64[squishConstant4D >> 3];
+          dx_ext1 = dx0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dy_ext1 = dy0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dz_ext1 = dz0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dw_ext1 = dw0 - 2.0 * heapF64[squishConstant4D >> 3];
+          if ((c1 & 0x01) != 0) {
+            xsv_ext0 = (xsv_ext0 + 1) | 0;
+            dx_ext0 = dx_ext0 - 1.0;
+            xsv_ext1 = (xsv_ext1 + 2) | 0;
+            dx_ext1 = dx_ext1 - 2.0;
+          } else if ((c1 & 0x02) != 0) {
+            ysv_ext0 = (ysv_ext0 + 1) | 0;
+            dy_ext0 = dy_ext0 - 1.0;
+            ysv_ext1 = (ysv_ext1 + 2) | 0;
+            dy_ext1 = dy_ext1 - 2.0;
+          } else if ((c1 & 0x04) != 0) {
+            zsv_ext0 = (zsv_ext0 + 1) | 0;
+            dz_ext0 = dz_ext0 - 1.0;
+            zsv_ext1 = (zsv_ext1 + 2) | 0;
+            dz_ext1 = dz_ext1 - 2.0;
+          } else {
+            wsv_ext0 = (wsv_ext0 + 1) | 0;
+            dw_ext0 = dw_ext0 - 1.0;
+            wsv_ext1 = (wsv_ext1 + 2) | 0;
+            dw_ext1 = dw_ext1 - 2.0;
+          }
+
+          // One contribution is a permutation of (1,1,1,-1) based on c2
+          xsv_ext2 = (xsb + 1) | 0;
+          ysv_ext2 = (ysb + 1) | 0;
+          zsv_ext2 = (zsb + 1) | 0;
+          wsv_ext2 = (wsb + 1) | 0;
+          dx_ext2 = dx0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dy_ext2 = dy0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dz_ext2 = dz0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+          dw_ext2 = dw0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+          if ((c2 & 0x01) == 0) {
+            xsv_ext2 = (xsv_ext2 - 2) | 0;
+            dx_ext2 = dx_ext2 + 2.0;
+          } else if ((c2 & 0x02) == 0) {
+            ysv_ext2 = (ysv_ext2 - 2) | 0;
+            dy_ext2 = dy_ext2 + 2.0;
+          } else if ((c2 & 0x04) == 0) {
+            zsv_ext2 = (zsv_ext2 - 2) | 0;
+            dz_ext2 = dz_ext2 + 2.0;
+          } else {
+            wsv_ext2 = (wsv_ext2 - 2) | 0;
+            dw_ext2 = dw_ext2 + 2.0;
+          }
+        } else {
+          // Both closest points on the smaller side
+          // One of the two extra points is (1,1,1,1)
+          xsv_ext2 = (xsb + 1) | 0;
+          ysv_ext2 = (ysb + 1) | 0;
+          zsv_ext2 = (zsb + 1) | 0;
+          wsv_ext2 = (wsb + 1) | 0;
+          dx_ext2 = dx0 - 1.0 - 4.0 * heapF64[squishConstant4D >> 3];
+          dy_ext2 = dy0 - 1.0 - 4.0 * heapF64[squishConstant4D >> 3];
+          dz_ext2 = dz0 - 1.0 - 4.0 * heapF64[squishConstant4D >> 3];
+          dw_ext2 = dw0 - 1.0 - 4.0 * heapF64[squishConstant4D >> 3];
+
+          // Other two points are based on the shared axes.
+          c = aPoint & bPoint & 0xff;
+
+          if ((c & 0x01) != 0) {
+            xsv_ext0 = (xsb + 2) | 0;
+            xsv_ext1 = (xsb + 1) | 0;
+            dx_ext0 = dx0 - 2.0 - 3.0 * heapF64[squishConstant4D >> 3];
+            dx_ext1 = dx0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+          } else {
+            xsv_ext0 = xsv_ext1 = xsb;
+            dx_ext0 = dx_ext1 = dx0 - 3.0 * heapF64[squishConstant4D >> 3];
+          }
+
+          if ((c & 0x02) != 0) {
+            ysv_ext0 = ysv_ext1 = (ysb + 1) | 0;
+            dy_ext0 = dy_ext1 = dy0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+            if ((c & 0x01) == 0) {
+              ysv_ext0 = (ysv_ext0 + 1) | 0;
+              dy_ext0 = dy_ext0 - 1.0;
+            } else {
+              ysv_ext1 = (ysv_ext1 + 1) | 0;
+              dy_ext1 = dy_ext1 - 1.0;
+            }
+          } else {
+            ysv_ext0 = ysv_ext1 = ysb;
+            dy_ext0 = dy_ext1 = dy0 - 3.0 * heapF64[squishConstant4D >> 3];
+          }
+
+          if ((c & 0x04) != 0) {
+            zsv_ext0 = zsv_ext1 = (zsb + 1) | 0;
+            dz_ext0 = dz_ext1 = dz0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+            if ((c & 0x03) == 0) {
+              zsv_ext0 = (zsv_ext0 + 1) | 0;
+              dz_ext0 = dz_ext0 - 1.0;
+            } else {
+              zsv_ext1 = (zsv_ext1 + 1) | 0;
+              dz_ext1 = dz_ext1 - 1.0;
+            }
+          } else {
+            zsv_ext0 = zsv_ext1 = zsb;
+            dz_ext0 = dz_ext1 = dz0 - 3.0 * heapF64[squishConstant4D >> 3];
+          }
+
+          if ((c & 0x08) != 0) {
+            wsv_ext0 = (wsb + 1) | 0;
+            wsv_ext1 = (wsb + 2) | 0;
+            dw_ext0 = dw0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+            dw_ext1 = dw0 - 2.0 - 3.0 * heapF64[squishConstant4D >> 3];
+          } else {
+            wsv_ext0 = wsv_ext1 = wsb;
+            dw_ext0 = dw_ext1 = dw0 - 3.0 * heapF64[squishConstant4D >> 3];
+          }
+        }
+      } else {
+        // One point on each "side"
+        c1, c2;
+        if (aIsBiggerSide) {
+          c1 = aPoint;
+          c2 = bPoint;
+        } else {
+          c1 = bPoint;
+          c2 = aPoint;
+        }
+
+        // Two contributions are the bigger-sided point with each 1 replaced with 2.
+        if ((c1 & 0x01) != 0) {
+          xsv_ext0 = (xsb + 2) | 0;
+          xsv_ext1 = (xsb + 1) | 0;
+          dx_ext0 = dx0 - 2.0 - 3.0 * heapF64[squishConstant4D >> 3];
+          dx_ext1 = dx0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+        } else {
+          xsv_ext0 = xsv_ext1 = xsb;
+          dx_ext0 = dx_ext1 = dx0 - 3.0 * heapF64[squishConstant4D >> 3];
+        }
+
+        if ((c1 & 0x02) != 0) {
+          ysv_ext0 = ysv_ext1 = (ysb + 1) | 0;
+          dy_ext0 = dy_ext1 = dy0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+          if ((c1 & 0x01) == 0) {
+            ysv_ext0 = (ysv_ext0 + 1) | 0;
+            dy_ext0 = dy_ext0 - 1.0;
+          } else {
+            ysv_ext1 = (ysv_ext1 + 1) | 0;
+            dy_ext1 = dy_ext1 - 1.0;
+          }
+        } else {
+          ysv_ext0 = ysv_ext1 = ysb;
+          dy_ext0 = dy_ext1 = dy0 - 3.0 * heapF64[squishConstant4D >> 3];
+        }
+
+        if ((c1 & 0x04) != 0) {
+          zsv_ext0 = zsv_ext1 = (zsb + 1) | 0;
+          dz_ext0 = dz_ext1 = dz0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+          if ((c1 & 0x03) == 0) {
+            zsv_ext0 = (zsv_ext0 + 1) | 0;
+            dz_ext0 = dz_ext0 - 1.0;
+          } else {
+            zsv_ext1 = (zsv_ext1 + 1) | 0;
+            dz_ext1 = dz_ext1 - 1.0;
+          }
+        } else {
+          zsv_ext0 = zsv_ext1 = zsb;
+          dz_ext0 = dz_ext1 = dz0 - 3.0 * heapF64[squishConstant4D >> 3];
+        }
+
+        if ((c1 & 0x08) != 0) {
+          wsv_ext0 = (wsb + 1) | 0;
+          wsv_ext1 = (wsb + 2) | 0;
+          dw_ext0 = dw0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+          dw_ext1 = dw0 - 2.0 - 3.0 * heapF64[squishConstant4D >> 3];
+        } else {
+          wsv_ext0 = wsv_ext1 = wsb;
+          dw_ext0 = dw_ext1 = dw0 - 3.0 * heapF64[squishConstant4D >> 3];
+        }
+
+        // One contribution is a permutation of (1,1,1,-1) based on the smaller-sided point
+        xsv_ext2 = (xsb + 1) | 0;
+        ysv_ext2 = (ysb + 1) | 0;
+        zsv_ext2 = (zsb + 1) | 0;
+        wsv_ext2 = (wsb + 1) | 0;
+        dx_ext2 = dx0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+        dy_ext2 = dy0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+        dz_ext2 = dz0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+        dw_ext2 = dw0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+        if ((c2 & 0x01) == 0) {
+          xsv_ext2 = (xsv_ext2 - 2) | 0;
+          dx_ext2 = dx_ext2 + 2.0;
+        } else if ((c2 & 0x02) == 0) {
+          ysv_ext2 = (ysv_ext2 - 2) | 0;
+          dy_ext2 = dy_ext2 + 2.0;
+        } else if ((c2 & 0x04) == 0) {
+          zsv_ext2 = (zsv_ext2 - 2) | 0;
+          dz_ext2 = dz_ext2 + 2.0;
+        } else {
+          wsv_ext2 = (wsv_ext2 - 2) | 0;
+          dw_ext2 = dw_ext2 + 2.0;
+        }
+      }
+
+      // Contribution (1,1,1,0)
+      dx4 = dx0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+      dy4 = dy0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+      dz4 = dz0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+      dw4 = dw0 - 3.0 * heapF64[squishConstant4D >> 3];
+      attn4 = 2.0 - dx4 * dx4 - dy4 * dy4 - dz4 * dz4 - dw4 * dw4;
+      if (attn4 > 0.0) {
+        attn4 = attn4 * attn4;
+        value =
+          value +
+          attn4 *
+            attn4 *
+            +extrapolate4D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx4, dy4, dz4, dw4);
+      }
+
+      // Contribution (1,1,0,1)
+      dx3 = dx4;
+      dy3 = dy4;
+      dz3 = dz0 - 3.0 * heapF64[squishConstant4D >> 3];
+      dw3 = dw0 - 1.0 - 3.0 * heapF64[squishConstant4D >> 3];
+      attn3 = 2.0 - dx3 * dx3 - dy3 * dy3 - dz3 * dz3 - dw3 * dw3;
+      if (attn3 > 0.0) {
+        attn3 = attn3 * attn3;
+        value =
+          value +
+          attn3 *
+            attn3 *
+            +extrapolate4D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx3, dy3, dz3, dw3);
+      }
+
+      // Contribution (1,0,1,1)
+      dx2 = dx4;
+      dy2 = dy0 - 3.0 * heapF64[squishConstant4D >> 3];
+      dz2 = dz4;
+      dw2 = dw3;
+      attn2 = 2.0 - dx2 * dx2 - dy2 * dy2 - dz2 * dz2 - dw2 * dw2;
+      if (attn2 > 0.0) {
+        attn2 = attn2 * attn2;
+        value =
+          value +
+          attn2 *
+            attn2 *
+            +extrapolate4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 1) | 0, dx2, dy2, dz2, dw2);
+      }
+
+      // Contribution (0,1,1,1)
+      dx1 = dx0 - 3.0 * heapF64[squishConstant4D >> 3];
+      dz1 = dz4;
+      dy1 = dy4;
+      dw1 = dw3;
+      attn1 = 2.0 - dx1 * dx1 - dy1 * dy1 - dz1 * dz1 - dw1 * dw1;
+      if (attn1 > 0.0) {
+        attn1 = attn1 * attn1;
+        value =
+          value +
+          attn1 *
+            attn1 *
+            +extrapolate4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 1) | 0, (wsb + 1) | 0, dx1, dy1, dz1, dw1);
+      }
+
+      // Contribution (1,1,0,0)
+      dx5 = dx0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dy5 = dy0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dz5 = dz0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dw5 = dw0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      attn5 = 2.0 - dx5 * dx5 - dy5 * dy5 - dz5 * dz5 - dw5 * dw5;
+      if (attn5 > 0.0) {
+        attn5 = attn5 * attn5;
+        value =
+          value +
+          attn5 *
+            attn5 *
+            +extrapolate4D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 0) | 0, dx5, dy5, dz5, dw5);
+      }
+
+      // Contribution (1,0,1,0)
+      dx6 = dx0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dy6 = dy0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dz6 = dz0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dw6 = dw0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      attn6 = 2.0 - dx6 * dx6 - dy6 * dy6 - dz6 * dz6 - dw6 * dw6;
+      if (attn6 > 0.0) {
+        attn6 = attn6 * attn6;
+        value =
+          value +
+          attn6 *
+            attn6 *
+            +extrapolate4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx6, dy6, dz6, dw6);
+      }
+
+      // Contribution (1,0,0,1)
+      dx7 = dx0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dy7 = dy0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dz7 = dz0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dw7 = dw0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      attn7 = 2.0 - dx7 * dx7 - dy7 * dy7 - dz7 * dz7 - dw7 * dw7;
+      if (attn7 > 0.0) {
+        attn7 = attn7 * attn7;
+        value =
+          value +
+          attn7 *
+            attn7 *
+            +extrapolate4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx7, dy7, dz7, dw7);
+      }
+
+      // Contribution (0,1,1,0)
+      dx8 = dx0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dy8 = dy0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dz8 = dz0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dw8 = dw0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      attn8 = 2.0 - dx8 * dx8 - dy8 * dy8 - dz8 * dz8 - dw8 * dw8;
+      if (attn8 > 0.0) {
+        attn8 = attn8 * attn8;
+        value =
+          value +
+          attn8 *
+            attn8 *
+            +extrapolate4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx8, dy8, dz8, dw8);
+      }
+
+      // Contribution (0,1,0,1)
+      dx9 = dx0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dy9 = dy0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dz9 = dz0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dw9 = dw0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      attn9 = 2.0 - dx9 * dx9 - dy9 * dy9 - dz9 * dz9 - dw9 * dw9;
+      if (attn9 > 0.0) {
+        attn9 = attn9 * attn9;
+        value =
+          value +
+          attn9 *
+            attn9 *
+            +extrapolate4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx9, dy9, dz9, dw9);
+      }
+
+      // Contribution (0,0,1,1)
+      dx10 = dx0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dy10 = dy0 - 0.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dz10 = dz0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      dw10 = dw0 - 1.0 - 2.0 * heapF64[squishConstant4D >> 3];
+      attn10 = 2.0 - dx10 * dx10 - dy10 * dy10 - dz10 * dz10 - dw10 * dw10;
+      if (attn10 > 0.0) {
+        attn10 = attn10 * attn10;
+        value =
+          value +
+          attn10 *
+            attn10 *
+            +extrapolate4D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 1) | 0, dx10, dy10, dz10, dw10);
+      }
+    }
+
+    // First extra vertex
+    attn_ext0 = 2.0 - dx_ext0 * dx_ext0 - dy_ext0 * dy_ext0 - dz_ext0 * dz_ext0 - dw_ext0 * dw_ext0;
+    if (attn_ext0 > 0.0) {
+      attn_ext0 = attn_ext0 * attn_ext0;
+      value =
+        value +
+        attn_ext0 *
+          attn_ext0 *
+          +extrapolate4D(xsv_ext0, ysv_ext0, zsv_ext0, wsv_ext0, dx_ext0, dy_ext0, dz_ext0, dw_ext0);
+    }
+
+    // Second extra vertex
+    attn_ext1 = 2.0 - dx_ext1 * dx_ext1 - dy_ext1 * dy_ext1 - dz_ext1 * dz_ext1 - dw_ext1 * dw_ext1;
+    if (attn_ext1 > 0.0) {
+      attn_ext1 = attn_ext1 * attn_ext1;
+      value =
+        value +
+        attn_ext1 *
+          attn_ext1 *
+          +extrapolate4D(xsv_ext1, ysv_ext1, zsv_ext1, wsv_ext1, dx_ext1, dy_ext1, dz_ext1, dw_ext1);
+    }
+
+    // Third extra vertex
+    attn_ext2 = 2.0 - dx_ext2 * dx_ext2 - dy_ext2 * dy_ext2 - dz_ext2 * dz_ext2 - dw_ext2 * dw_ext2;
+    if (attn_ext2 > 0.0) {
+      attn_ext2 = attn_ext2 * attn_ext2;
+      value =
+        value +
+        attn_ext2 *
+          attn_ext2 *
+          +extrapolate4D(xsv_ext2, ysv_ext2, zsv_ext2, wsv_ext2, dx_ext2, dy_ext2, dz_ext2, dw_ext2);
+    }
+
+    return value;
   }
 
   return {
     setSeed: setSeed,
     openSimplexUnoptimized2D: openSimplexUnoptimized2D,
     openSimplexUnoptimized3D: openSimplexUnoptimized3D,
+    openSimplexUnoptimized4D: openSimplexUnoptimized4D,
   };
 }
 
@@ -1201,7 +2836,7 @@ for (let i = 0; i < 4 * 0x800; i++) {
   heapF64[6 + (2 + 3) * 0x800 + i] = gradients4D[i % gradients4D.length];
 }
 
-const { setSeed, openSimplexUnoptimized2D, openSimplexUnoptimized3D } = OpenSimplex(
+const { setSeed, openSimplexUnoptimized2D, openSimplexUnoptimized3D, openSimplexUnoptimized4D } = OpenSimplex(
   {
     Math,
     Uint16Array,
@@ -1227,4 +2862,5 @@ export default {
   },
   openSimplexUnoptimized2D,
   openSimplexUnoptimized3D,
+  openSimplexUnoptimized4D,
 };
