@@ -19,19 +19,19 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
   var Z = 0x10;
   var W = 0x18;
 
-  var stretchConstant2D = 0x00;
-  var stretchConstant3D = 0x08;
-  var stretchConstant4D = 0x10;
+  var perm = 0x0; // 2048 permutations * 2 byte
 
-  var squishConstant2D = 0x18;
-  var squishConstant3D = 0x20;
-  var squishConstant4D = 0x28;
+  var stretchConstant2D = 0x1000;
+  var stretchConstant3D = 0x1008;
+  var stretchConstant4D = 0x1010;
 
-  var gradients2D = 0x00030; // 2048 gradients * 2 dimensions * 8 bytes
-  var gradients3D = 0x08030; // 2048 gradients * 3 dimensions * 8 bytes
-  var gradients4D = 0x14030; // 2048 gradients * 4 dimensions * 8 bytes
+  var squishConstant2D = 0x1018;
+  var squishConstant3D = 0x1020;
+  var squishConstant4D = 0x1028;
 
-  var perm = 0x24030; // 2048 permutations * 2 byte
+  var gradients2D = 0x01030; // 2048 gradients * 2 dimensions * 8 bytes
+  var gradients3D = 0x09030; // 2048 gradients * 3 dimensions * 8 bytes
+  var gradients4D = 0x15030; // 2048 gradients * 4 dimensions * 8 bytes
 
   function normalize(n) {
     n = +n;
@@ -2582,7 +2582,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
 
 const heap = new ArrayBuffer(0x100000);
 {
-  const heapF64 = new Float64Array(heap);
+  const heapF64 = new Float64Array(heap, 0x800 * 2);
 
   // prettier-ignore
   const gradients2D = [
