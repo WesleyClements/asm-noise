@@ -33,6 +33,11 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
 
   var perm = 0x24030; // 2048 permutations * 2 byte
 
+  function normalize(n) {
+    n = +n;
+    return (n + 1.0) / 2.0;
+  }
+
   function setSeed(value) {
     value = +value;
     var i = 0;
@@ -201,7 +206,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
       attn_ext = attn_ext * attn_ext;
       value = value + attn_ext * attn_ext * +extrapolate2D(xsv_ext, ysv_ext, dx_ext, dy_ext);
     }
-    return value;
+    return +normalize(value);
   }
 
   function extrapolate3D(xsb, ysb, zsb, dx, dy, dz) {
@@ -903,7 +908,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
       value = value + attn_ext1 * attn_ext1 * +extrapolate3D(xsv_ext1, ysv_ext1, zsv_ext1, dx_ext1, dy_ext1, dz_ext1);
     }
 
-    return value;
+    return +normalize(value);
   }
 
   function extrapolate4D(xsb, ysb, zsb, wsb, dx, dy, dz, dw) {
@@ -2559,7 +2564,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
           +extrapolate4D(xsv_ext2, ysv_ext2, zsv_ext2, wsv_ext2, dx_ext2, dy_ext2, dz_ext2, dw_ext2);
     }
 
-    return value;
+    return +normalize(value);
   }
 
   return {
