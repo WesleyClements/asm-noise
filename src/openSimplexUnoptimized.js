@@ -62,7 +62,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
     return heapUint16[(perm + (i << 1)) >> 1] | 0;
   }
 
-  function extrapolate2D(xsb, ysb, dx, dy) {
+  function grad2D(xsb, ysb, dx, dy) {
     xsb = xsb | 0;
     ysb = ysb | 0;
     dx = +dx;
@@ -129,7 +129,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
     attn1 = 2.0 - dx1 * dx1 - dy1 * dy1;
     if (attn1 > 0.0) {
       attn1 = attn1 * attn1;
-      value = value + attn1 * attn1 * +extrapolate2D((xsb + 1) | 0, (ysb + 0) | 0, dx1, dy1);
+      value = value + attn1 * attn1 * +grad2D((xsb + 1) | 0, (ysb + 0) | 0, dx1, dy1);
     }
 
     // Contribution (0,1)
@@ -138,7 +138,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
     attn2 = 2.0 - dx2 * dx2 - dy2 * dy2;
     if (attn2 > 0.0) {
       attn2 = attn2 * attn2;
-      value = value + attn2 * attn2 * +extrapolate2D((xsb + 0) | 0, (ysb + 1) | 0, dx2, dy2);
+      value = value + attn2 * attn2 * +grad2D((xsb + 0) | 0, (ysb + 1) | 0, dx2, dy2);
     }
 
     if (inSum <= 1.0) {
@@ -197,19 +197,19 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
     attn0 = 2.0 - dx0 * dx0 - dy0 * dy0;
     if (attn0 > 0.0) {
       attn0 = attn0 * attn0;
-      value = value + attn0 * attn0 * +extrapolate2D(xsb, ysb, dx0, dy0);
+      value = value + attn0 * attn0 * +grad2D(xsb, ysb, dx0, dy0);
     }
 
     // Extra Vertex
     attn_ext = 2.0 - dx_ext * dx_ext - dy_ext * dy_ext;
     if (attn_ext > 0.0) {
       attn_ext = attn_ext * attn_ext;
-      value = value + attn_ext * attn_ext * +extrapolate2D(xsv_ext, ysv_ext, dx_ext, dy_ext);
+      value = value + attn_ext * attn_ext * +grad2D(xsv_ext, ysv_ext, dx_ext, dy_ext);
     }
     return +normalize(value);
   }
 
-  function extrapolate3D(xsb, ysb, zsb, dx, dy, dz) {
+  function grad3D(xsb, ysb, zsb, dx, dy, dz) {
     xsb = xsb | 0;
     ysb = ysb | 0;
     zsb = zsb | 0;
@@ -488,7 +488,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
       attn0 = 2.0 - dx0 * dx0 - dy0 * dy0 - dz0 * dz0;
       if (attn0 > 0.0) {
         attn0 = attn0 * attn0;
-        value = value + attn0 * attn0 * +extrapolate3D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 0) | 0, dx0, dy0, dz0);
+        value = value + attn0 * attn0 * +grad3D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 0) | 0, dx0, dy0, dz0);
       }
 
       // Contribution (1,0,0)
@@ -498,7 +498,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
       attn1 = 2.0 - dx1 * dx1 - dy1 * dy1 - dz1 * dz1;
       if (attn1 > 0.0) {
         attn1 = attn1 * attn1;
-        value = value + attn1 * attn1 * +extrapolate3D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 0) | 0, dx1, dy1, dz1);
+        value = value + attn1 * attn1 * +grad3D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 0) | 0, dx1, dy1, dz1);
       }
 
       // Contribution (0,1,0)
@@ -508,7 +508,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
       attn2 = 2.0 - dx2 * dx2 - dy2 * dy2 - dz2 * dz2;
       if (attn2 > 0.0) {
         attn2 = attn2 * attn2;
-        value = value + attn2 * attn2 * +extrapolate3D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 0) | 0, dx2, dy2, dz2);
+        value = value + attn2 * attn2 * +grad3D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 0) | 0, dx2, dy2, dz2);
       }
 
       // Contribution (0,0,1)
@@ -518,7 +518,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
       attn3 = 2.0 - dx3 * dx3 - dy3 * dy3 - dz3 * dz3;
       if (attn3 > 0.0) {
         attn3 = attn3 * attn3;
-        value = value + attn3 * attn3 * +extrapolate3D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 1) | 0, dx3, dy3, dz3);
+        value = value + attn3 * attn3 * +grad3D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 1) | 0, dx3, dy3, dz3);
       }
     } else if (inSum >= 2.0) {
       // We're inside the tetrahedron (3-Simplex) at (1,1,1)
@@ -622,7 +622,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
       attn3 = 2.0 - dx3 * dx3 - dy3 * dy3 - dz3 * dz3;
       if (attn3 > 0.0) {
         attn3 = attn3 * attn3;
-        value = value + attn3 * attn3 * +extrapolate3D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 0) | 0, dx3, dy3, dz3);
+        value = value + attn3 * attn3 * +grad3D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 0) | 0, dx3, dy3, dz3);
       }
 
       // Contribution (1,0,1)
@@ -632,7 +632,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
       attn2 = 2.0 - dx2 * dx2 - dy2 * dy2 - dz2 * dz2;
       if (attn2 > 0.0) {
         attn2 = attn2 * attn2;
-        value = value + attn2 * attn2 * +extrapolate3D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 1) | 0, dx2, dy2, dz2);
+        value = value + attn2 * attn2 * +grad3D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 1) | 0, dx2, dy2, dz2);
       }
 
       // Contribution (0,1,1)
@@ -642,7 +642,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
       attn1 = 2.0 - dx1 * dx1 - dy1 * dy1 - dz1 * dz1;
       if (attn1 > 0.0) {
         attn1 = attn1 * attn1;
-        value = value + attn1 * attn1 * +extrapolate3D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 1) | 0, dx1, dy1, dz1);
+        value = value + attn1 * attn1 * +grad3D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 1) | 0, dx1, dy1, dz1);
       }
 
       // Contribution (1,1,1)
@@ -652,7 +652,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
       attn0 = 2.0 - dx0 * dx0 - dy0 * dy0 - dz0 * dz0;
       if (attn0 > 0.0) {
         attn0 = attn0 * attn0;
-        value = value + attn0 * attn0 * +extrapolate3D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 1) | 0, dx0, dy0, dz0);
+        value = value + attn0 * attn0 * +grad3D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 1) | 0, dx0, dy0, dz0);
       }
     } else {
       // We're inside the octahedron (Rectified 3-Simplex) in between.
@@ -840,7 +840,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
       attn1 = 2.0 - dx1 * dx1 - dy1 * dy1 - dz1 * dz1;
       if (attn1 > 0.0) {
         attn1 = attn1 * attn1;
-        value = value + attn1 * attn1 * +extrapolate3D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 0) | 0, dx1, dy1, dz1);
+        value = value + attn1 * attn1 * +grad3D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 0) | 0, dx1, dy1, dz1);
       }
 
       // Contribution (0,1,0)
@@ -850,7 +850,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
       attn2 = 2.0 - dx2 * dx2 - dy2 * dy2 - dz2 * dz2;
       if (attn2 > 0.0) {
         attn2 = attn2 * attn2;
-        value = value + attn2 * attn2 * +extrapolate3D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 0) | 0, dx2, dy2, dz2);
+        value = value + attn2 * attn2 * +grad3D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 0) | 0, dx2, dy2, dz2);
       }
 
       // Contribution (0,0,1)
@@ -860,7 +860,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
       attn3 = 2.0 - dx3 * dx3 - dy3 * dy3 - dz3 * dz3;
       if (attn3 > 0.0) {
         attn3 = attn3 * attn3;
-        value = value + attn3 * attn3 * +extrapolate3D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 1) | 0, dx3, dy3, dz3);
+        value = value + attn3 * attn3 * +grad3D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 1) | 0, dx3, dy3, dz3);
       }
 
       // Contribution (1,1,0)
@@ -870,7 +870,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
       attn4 = 2.0 - dx4 * dx4 - dy4 * dy4 - dz4 * dz4;
       if (attn4 > 0.0) {
         attn4 = attn4 * attn4;
-        value = value + attn4 * attn4 * +extrapolate3D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 0) | 0, dx4, dy4, dz4);
+        value = value + attn4 * attn4 * +grad3D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 0) | 0, dx4, dy4, dz4);
       }
 
       // Contribution (1,0,1)
@@ -880,7 +880,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
       attn5 = 2.0 - dx5 * dx5 - dy5 * dy5 - dz5 * dz5;
       if (attn5 > 0.0) {
         attn5 = attn5 * attn5;
-        value = value + attn5 * attn5 * +extrapolate3D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 1) | 0, dx5, dy5, dz5);
+        value = value + attn5 * attn5 * +grad3D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 1) | 0, dx5, dy5, dz5);
       }
 
       // Contribution (0,1,1)
@@ -890,7 +890,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
       attn6 = 2.0 - dx6 * dx6 - dy6 * dy6 - dz6 * dz6;
       if (attn6 > 0.0) {
         attn6 = attn6 * attn6;
-        value = value + attn6 * attn6 * +extrapolate3D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 1) | 0, dx6, dy6, dz6);
+        value = value + attn6 * attn6 * +grad3D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 1) | 0, dx6, dy6, dz6);
       }
     }
 
@@ -898,20 +898,20 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
     attn_ext0 = 2.0 - dx_ext0 * dx_ext0 - dy_ext0 * dy_ext0 - dz_ext0 * dz_ext0;
     if (attn_ext0 > 0.0) {
       attn_ext0 = attn_ext0 * attn_ext0;
-      value = value + attn_ext0 * attn_ext0 * +extrapolate3D(xsv_ext0, ysv_ext0, zsv_ext0, dx_ext0, dy_ext0, dz_ext0);
+      value = value + attn_ext0 * attn_ext0 * +grad3D(xsv_ext0, ysv_ext0, zsv_ext0, dx_ext0, dy_ext0, dz_ext0);
     }
 
     // Second extra vertex
     attn_ext1 = 2.0 - dx_ext1 * dx_ext1 - dy_ext1 * dy_ext1 - dz_ext1 * dz_ext1;
     if (attn_ext1 > 0.0) {
       attn_ext1 = attn_ext1 * attn_ext1;
-      value = value + attn_ext1 * attn_ext1 * +extrapolate3D(xsv_ext1, ysv_ext1, zsv_ext1, dx_ext1, dy_ext1, dz_ext1);
+      value = value + attn_ext1 * attn_ext1 * +grad3D(xsv_ext1, ysv_ext1, zsv_ext1, dx_ext1, dy_ext1, dz_ext1);
     }
 
     return +normalize(value);
   }
 
-  function extrapolate4D(xsb, ysb, zsb, wsb, dx, dy, dz, dw) {
+  function grad4D(xsb, ysb, zsb, wsb, dx, dy, dz, dw) {
     xsb = xsb | 0;
     ysb = ysb | 0;
     zsb = zsb | 0;
@@ -1321,9 +1321,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn0 = attn0 * attn0;
         value =
           value +
-          attn0 *
-            attn0 *
-            +extrapolate4D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 0) | 0, (wsb + 0) | 0, dx0, dy0, dz0, dw0);
+          attn0 * attn0 * +grad4D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 0) | 0, (wsb + 0) | 0, dx0, dy0, dz0, dw0);
       }
 
       // Contribution (1,0,0,0)
@@ -1336,9 +1334,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn1 = attn1 * attn1;
         value =
           value +
-          attn1 *
-            attn1 *
-            +extrapolate4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 0) | 0, (wsb + 0) | 0, dx1, dy1, dz1, dw1);
+          attn1 * attn1 * +grad4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 0) | 0, (wsb + 0) | 0, dx1, dy1, dz1, dw1);
       }
 
       // Contribution (0,1,0,0)
@@ -1351,9 +1347,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn2 = attn2 * attn2;
         value =
           value +
-          attn2 *
-            attn2 *
-            +extrapolate4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 0) | 0, dx2, dy2, dz2, dw2);
+          attn2 * attn2 * +grad4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 0) | 0, dx2, dy2, dz2, dw2);
       }
 
       // Contribution (0,0,1,0)
@@ -1366,9 +1360,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn3 = attn3 * attn3;
         value =
           value +
-          attn3 *
-            attn3 *
-            +extrapolate4D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx3, dy3, dz3, dw3);
+          attn3 * attn3 * +grad4D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx3, dy3, dz3, dw3);
       }
 
       // Contribution (0,0,0,1)
@@ -1381,9 +1373,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn4 = attn4 * attn4;
         value =
           value +
-          attn4 *
-            attn4 *
-            +extrapolate4D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx4, dy4, dz4, dw4);
+          attn4 * attn4 * +grad4D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx4, dy4, dz4, dw4);
       }
     } else if (inSum >= 3.0) {
       // We're inside the pentachoron (4-Simplex) at (1,1,1,1)
@@ -1541,9 +1531,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn4 = attn4 * attn4;
         value =
           value +
-          attn4 *
-            attn4 *
-            +extrapolate4D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx4, dy4, dz4, dw4);
+          attn4 * attn4 * +grad4D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx4, dy4, dz4, dw4);
       }
 
       // Contribution (1,1,0,1)
@@ -1556,9 +1544,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn3 = attn3 * attn3;
         value =
           value +
-          attn3 *
-            attn3 *
-            +extrapolate4D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx3, dy3, dz3, dw3);
+          attn3 * attn3 * +grad4D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx3, dy3, dz3, dw3);
       }
 
       // Contribution (1,0,1,1)
@@ -1571,9 +1557,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn2 = attn2 * attn2;
         value =
           value +
-          attn2 *
-            attn2 *
-            +extrapolate4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 1) | 0, dx2, dy2, dz2, dw2);
+          attn2 * attn2 * +grad4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 1) | 0, dx2, dy2, dz2, dw2);
       }
 
       // Contribution (0,1,1,1)
@@ -1586,9 +1570,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn1 = attn1 * attn1;
         value =
           value +
-          attn1 *
-            attn1 *
-            +extrapolate4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 1) | 0, (wsb + 1) | 0, dx1, dy1, dz1, dw1);
+          attn1 * attn1 * +grad4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 1) | 0, (wsb + 1) | 0, dx1, dy1, dz1, dw1);
       }
 
       // Contribution (1,1,1,1)
@@ -1601,9 +1583,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn0 = attn0 * attn0;
         value =
           value +
-          attn0 *
-            attn0 *
-            +extrapolate4D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 1) | 0, (wsb + 1) | 0, dx0, dy0, dz0, dw0);
+          attn0 * attn0 * +grad4D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 1) | 0, (wsb + 1) | 0, dx0, dy0, dz0, dw0);
       }
     } else if (inSum <= 2.0) {
       // We're inside the first dispentachoron (Rectified 4-Simplex)
@@ -1930,9 +1910,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn1 = attn1 * attn1;
         value =
           value +
-          attn1 *
-            attn1 *
-            +extrapolate4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 0) | 0, (wsb + 0) | 0, dx1, dy1, dz1, dw1);
+          attn1 * attn1 * +grad4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 0) | 0, (wsb + 0) | 0, dx1, dy1, dz1, dw1);
       }
 
       // Contribution (0,1,0,0)
@@ -1945,9 +1923,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn2 = attn2 * attn2;
         value =
           value +
-          attn2 *
-            attn2 *
-            +extrapolate4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 0) | 0, dx2, dy2, dz2, dw2);
+          attn2 * attn2 * +grad4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 0) | 0, dx2, dy2, dz2, dw2);
       }
 
       // Contribution (0,0,1,0)
@@ -1960,9 +1936,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn3 = attn3 * attn3;
         value =
           value +
-          attn3 *
-            attn3 *
-            +extrapolate4D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx3, dy3, dz3, dw3);
+          attn3 * attn3 * +grad4D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx3, dy3, dz3, dw3);
       }
 
       // Contribution (0,0,0,1)
@@ -1975,9 +1949,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn4 = attn4 * attn4;
         value =
           value +
-          attn4 *
-            attn4 *
-            +extrapolate4D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx4, dy4, dz4, dw4);
+          attn4 * attn4 * +grad4D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx4, dy4, dz4, dw4);
       }
 
       // Contribution (1,1,0,0)
@@ -1990,9 +1962,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn5 = attn5 * attn5;
         value =
           value +
-          attn5 *
-            attn5 *
-            +extrapolate4D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 0) | 0, dx5, dy5, dz5, dw5);
+          attn5 * attn5 * +grad4D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 0) | 0, dx5, dy5, dz5, dw5);
       }
 
       // Contribution (1,0,1,0)
@@ -2005,9 +1975,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn6 = attn6 * attn6;
         value =
           value +
-          attn6 *
-            attn6 *
-            +extrapolate4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx6, dy6, dz6, dw6);
+          attn6 * attn6 * +grad4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx6, dy6, dz6, dw6);
       }
 
       // Contribution (1,0,0,1)
@@ -2020,9 +1988,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn7 = attn7 * attn7;
         value =
           value +
-          attn7 *
-            attn7 *
-            +extrapolate4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx7, dy7, dz7, dw7);
+          attn7 * attn7 * +grad4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx7, dy7, dz7, dw7);
       }
 
       // Contribution (0,1,1,0)
@@ -2035,9 +2001,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn8 = attn8 * attn8;
         value =
           value +
-          attn8 *
-            attn8 *
-            +extrapolate4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx8, dy8, dz8, dw8);
+          attn8 * attn8 * +grad4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx8, dy8, dz8, dw8);
       }
 
       // Contribution (0,1,0,1)
@@ -2050,9 +2014,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn9 = attn9 * attn9;
         value =
           value +
-          attn9 *
-            attn9 *
-            +extrapolate4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx9, dy9, dz9, dw9);
+          attn9 * attn9 * +grad4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx9, dy9, dz9, dw9);
       }
 
       // Contribution (0,0,1,1)
@@ -2065,9 +2027,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn10 = attn10 * attn10;
         value =
           value +
-          attn10 *
-            attn10 *
-            +extrapolate4D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 1) | 0, dx10, dy10, dz10, dw10);
+          attn10 * attn10 * +grad4D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 1) | 0, dx10, dy10, dz10, dw10);
       }
     } else {
       // We're inside the second dispentachoron (Rectified 4-Simplex)
@@ -2390,9 +2350,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn4 = attn4 * attn4;
         value =
           value +
-          attn4 *
-            attn4 *
-            +extrapolate4D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx4, dy4, dz4, dw4);
+          attn4 * attn4 * +grad4D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx4, dy4, dz4, dw4);
       }
 
       // Contribution (1,1,0,1)
@@ -2405,9 +2363,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn3 = attn3 * attn3;
         value =
           value +
-          attn3 *
-            attn3 *
-            +extrapolate4D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx3, dy3, dz3, dw3);
+          attn3 * attn3 * +grad4D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx3, dy3, dz3, dw3);
       }
 
       // Contribution (1,0,1,1)
@@ -2420,9 +2376,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn2 = attn2 * attn2;
         value =
           value +
-          attn2 *
-            attn2 *
-            +extrapolate4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 1) | 0, dx2, dy2, dz2, dw2);
+          attn2 * attn2 * +grad4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 1) | 0, dx2, dy2, dz2, dw2);
       }
 
       // Contribution (0,1,1,1)
@@ -2435,9 +2389,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn1 = attn1 * attn1;
         value =
           value +
-          attn1 *
-            attn1 *
-            +extrapolate4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 1) | 0, (wsb + 1) | 0, dx1, dy1, dz1, dw1);
+          attn1 * attn1 * +grad4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 1) | 0, (wsb + 1) | 0, dx1, dy1, dz1, dw1);
       }
 
       // Contribution (1,1,0,0)
@@ -2450,9 +2402,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn5 = attn5 * attn5;
         value =
           value +
-          attn5 *
-            attn5 *
-            +extrapolate4D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 0) | 0, dx5, dy5, dz5, dw5);
+          attn5 * attn5 * +grad4D((xsb + 1) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 0) | 0, dx5, dy5, dz5, dw5);
       }
 
       // Contribution (1,0,1,0)
@@ -2465,9 +2415,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn6 = attn6 * attn6;
         value =
           value +
-          attn6 *
-            attn6 *
-            +extrapolate4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx6, dy6, dz6, dw6);
+          attn6 * attn6 * +grad4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx6, dy6, dz6, dw6);
       }
 
       // Contribution (1,0,0,1)
@@ -2480,9 +2428,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn7 = attn7 * attn7;
         value =
           value +
-          attn7 *
-            attn7 *
-            +extrapolate4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx7, dy7, dz7, dw7);
+          attn7 * attn7 * +grad4D((xsb + 1) | 0, (ysb + 0) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx7, dy7, dz7, dw7);
       }
 
       // Contribution (0,1,1,0)
@@ -2495,9 +2441,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn8 = attn8 * attn8;
         value =
           value +
-          attn8 *
-            attn8 *
-            +extrapolate4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx8, dy8, dz8, dw8);
+          attn8 * attn8 * +grad4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 1) | 0, (wsb + 0) | 0, dx8, dy8, dz8, dw8);
       }
 
       // Contribution (0,1,0,1)
@@ -2510,9 +2454,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn9 = attn9 * attn9;
         value =
           value +
-          attn9 *
-            attn9 *
-            +extrapolate4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx9, dy9, dz9, dw9);
+          attn9 * attn9 * +grad4D((xsb + 0) | 0, (ysb + 1) | 0, (zsb + 0) | 0, (wsb + 1) | 0, dx9, dy9, dz9, dw9);
       }
 
       // Contribution (0,0,1,1)
@@ -2525,9 +2467,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
         attn10 = attn10 * attn10;
         value =
           value +
-          attn10 *
-            attn10 *
-            +extrapolate4D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 1) | 0, dx10, dy10, dz10, dw10);
+          attn10 * attn10 * +grad4D((xsb + 0) | 0, (ysb + 0) | 0, (zsb + 1) | 0, (wsb + 1) | 0, dx10, dy10, dz10, dw10);
       }
     }
 
@@ -2537,9 +2477,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
       attn_ext0 = attn_ext0 * attn_ext0;
       value =
         value +
-        attn_ext0 *
-          attn_ext0 *
-          +extrapolate4D(xsv_ext0, ysv_ext0, zsv_ext0, wsv_ext0, dx_ext0, dy_ext0, dz_ext0, dw_ext0);
+        attn_ext0 * attn_ext0 * +grad4D(xsv_ext0, ysv_ext0, zsv_ext0, wsv_ext0, dx_ext0, dy_ext0, dz_ext0, dw_ext0);
     }
 
     // Second extra vertex
@@ -2548,9 +2486,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
       attn_ext1 = attn_ext1 * attn_ext1;
       value =
         value +
-        attn_ext1 *
-          attn_ext1 *
-          +extrapolate4D(xsv_ext1, ysv_ext1, zsv_ext1, wsv_ext1, dx_ext1, dy_ext1, dz_ext1, dw_ext1);
+        attn_ext1 * attn_ext1 * +grad4D(xsv_ext1, ysv_ext1, zsv_ext1, wsv_ext1, dx_ext1, dy_ext1, dz_ext1, dw_ext1);
     }
 
     // Third extra vertex
@@ -2559,9 +2495,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
       attn_ext2 = attn_ext2 * attn_ext2;
       value =
         value +
-        attn_ext2 *
-          attn_ext2 *
-          +extrapolate4D(xsv_ext2, ysv_ext2, zsv_ext2, wsv_ext2, dx_ext2, dy_ext2, dz_ext2, dw_ext2);
+        attn_ext2 * attn_ext2 * +grad4D(xsv_ext2, ysv_ext2, zsv_ext2, wsv_ext2, dx_ext2, dy_ext2, dz_ext2, dw_ext2);
     }
 
     return +normalize(value);
