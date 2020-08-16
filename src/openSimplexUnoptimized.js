@@ -2581,9 +2581,9 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
 }
 
 const heap = new ArrayBuffer(0x100000);
-const heapF64 = new Float64Array(heap);
-
 {
+  const heapF64 = new Float64Array(heap);
+
   // prettier-ignore
   const gradients2D = [
     0.130526192220052, 0.99144486137381,
