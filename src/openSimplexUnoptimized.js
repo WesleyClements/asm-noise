@@ -1,6 +1,6 @@
 import random from './random.js';
 
-function OpenSimplex(stdlib, foreign, heap) {
+function OpenSimplexUnoptimized(stdlib, foreign, heap) {
   'use asm';
   var imul = stdlib.Math.imul;
   var floor = stdlib.Math.floor;
@@ -68,7 +68,7 @@ function OpenSimplex(stdlib, foreign, heap) {
     return +heapF64[(gradients2D + (i << 4) + X) >> 3] * dx + +heapF64[(gradients2D + (i << 4) + Y) >> 3] * dy;
   }
 
-  function openSimplexUnoptimized2D(x, y) {
+  function eval2D(x, y) {
     x = +x;
     y = +y;
     var stretchOffset = 0.0;
@@ -223,7 +223,7 @@ function OpenSimplex(stdlib, foreign, heap) {
     );
   }
 
-  function openSimplexUnoptimized3D(x, y, z) {
+  function eval3D(x, y, z) {
     x = +x;
     y = +y;
     z = +z;
@@ -243,7 +243,7 @@ function OpenSimplex(stdlib, foreign, heap) {
 
   // Not as good as in SuperSimplex/OpenSimplex2S, since there are more visible differences between different slices.
   // The Z coordinate should always be the "different" coordinate in your use case.
-  function eval3_XYBeforeZ(x, y, z) {
+  function eval3DXYBeforeZ(x, y, z) {
     x = +x;
     y = +y;
     z = +z;
@@ -265,7 +265,7 @@ function OpenSimplex(stdlib, foreign, heap) {
   }
 
   // Similar to the above, except the Y coordinate should always be the "different" coordinate in your use case.
-  function eval3_XZBeforeY(x, y, z) {
+  function eval3DXZBeforeY(x, y, z) {
     x = +x;
     y = +y;
     z = +z;
@@ -928,7 +928,7 @@ function OpenSimplex(stdlib, foreign, heap) {
     );
   }
 
-  function openSimplexUnoptimized4D(x, y, z, w) {
+  function eval4D(x, y, z, w) {
     x = +x;
     y = +y;
     z = +z;
@@ -949,7 +949,7 @@ function OpenSimplex(stdlib, foreign, heap) {
     return +eval4DBase(xs, ys, zs, ws);
   }
 
-  function eval4_XYBeforeZW(x, y, z, w) {
+  function eval4DXYBeforeZW(x, y, z, w) {
     x = +x;
     y = +y;
     z = +z;
@@ -971,7 +971,7 @@ function OpenSimplex(stdlib, foreign, heap) {
     return +eval4DBase(xs, ys, zs, ws);
   }
 
-  function eval4_XZBeforeYW(x, y, z, w) {
+  function eval4DXZBeforeYW(x, y, z, w) {
     x = +x;
     y = +y;
     z = +z;
@@ -993,7 +993,7 @@ function OpenSimplex(stdlib, foreign, heap) {
     return +eval4DBase(xs, ys, zs, ws);
   }
 
-  function eval4_XYZBeforeW(x, y, z, w) {
+  function eval4DXYZBeforeW(x, y, z, w) {
     x = +x;
     y = +y;
     z = +z;
@@ -2564,21 +2564,19 @@ function OpenSimplex(stdlib, foreign, heap) {
 
   return {
     setSeed: setSeed,
-    openSimplexUnoptimized2D: openSimplexUnoptimized2D,
-    openSimplexUnoptimized3D: openSimplexUnoptimized3D,
-    openSimplexUnoptimized4D: openSimplexUnoptimized4D,
+    eval2D: eval2D,
+    eval3D: eval3D,
+    eval3DXYBeforeZ: eval3DXYBeforeZ,
+    eval3DXZBeforeY: eval3DXZBeforeY,
+    eval4D: eval4D,
+    eval4DXYBeforeZW: eval4DXYBeforeZW,
+    eval4DXZBeforeYW: eval4DXZBeforeYW,
+    eval4DXYZBeforeW: eval4DXYZBeforeW,
   };
 }
 
 const heap = new ArrayBuffer(0x100000);
 const heapF64 = new Float64Array(heap);
-
-heapF64[0 + 0] = (1 / Math.sqrt(2 + 1) - 1) / 2; // stretch constant 2d
-heapF64[3 + 0] = (Math.sqrt(2 + 1) - 1) / 2; // squish constant 2d
-heapF64[0 + 1] = (1 / Math.sqrt(3 + 1) - 1) / 3; // stretch constant 3d
-heapF64[3 + 1] = (Math.sqrt(3 + 1) - 1) / 3; // squish constant 3d
-heapF64[0 + 2] = (1 / Math.sqrt(4 + 1) - 1) / 4; // stretch constant 4d
-heapF64[3 + 2] = (Math.sqrt(4 + 1) - 1) / 4; // squish constant 4d
 
 // prettier-ignore
 const gradients2D = [
@@ -2824,19 +2822,37 @@ const gradients4D = [
   0.753341017856078, 0.37968289875261624, 0.37968289875261624, 0.37968289875261624,
 ].map((n) => n / 8.881759591352166);
 
+heapF64[0 + 0] = (1 / Math.sqrt(2 + 1) - 1) / 2; // stretch constant 2d
+heapF64[3 + 0] = (Math.sqrt(2 + 1) - 1) / 2; // squish constant 2d
+heapF64[0 + 1] = (1 / Math.sqrt(3 + 1) - 1) / 3; // stretch constant 3d
+heapF64[3 + 1] = (Math.sqrt(3 + 1) - 1) / 3; // squish constant 3d
+heapF64[0 + 2] = (1 / Math.sqrt(4 + 1) - 1) / 4; // stretch constant 4d
+heapF64[3 + 2] = (Math.sqrt(4 + 1) - 1) / 4; // squish constant 4d
+
+let offset = 6;
 for (let i = 0; i < 2 * 0x800; i++) {
-  heapF64[6 + i] = gradients2D[i % gradients2D.length];
+  heapF64[offset + i] = gradients2D[i % gradients2D.length];
 }
-
+offset += 2 * 0x800;
 for (let i = 0; i < 3 * 0x800; i++) {
-  heapF64[6 + 2 * 0x800 + i] = gradients3D[i % gradients3D.length];
+  heapF64[offset + i] = gradients3D[i % gradients3D.length];
 }
-
+offset += 3 * 0x800;
 for (let i = 0; i < 4 * 0x800; i++) {
-  heapF64[6 + (2 + 3) * 0x800 + i] = gradients4D[i % gradients4D.length];
+  heapF64[offset + i] = gradients4D[i % gradients4D.length];
 }
 
-const { setSeed, openSimplexUnoptimized2D, openSimplexUnoptimized3D, openSimplexUnoptimized4D } = OpenSimplex(
+const {
+  setSeed,
+  eval2D,
+  eval3D,
+  eval3DXYBeforeZ,
+  eval3DXZBeforeY,
+  eval4D,
+  eval4DXYBeforeZW,
+  eval4DXZBeforeYW,
+  eval4DXYZBeforeW,
+} = OpenSimplexUnoptimized(
   {
     Math,
     Uint16Array,
@@ -2860,7 +2876,7 @@ export default {
   get seed() {
     return seed;
   },
-  openSimplexUnoptimized2D,
-  openSimplexUnoptimized3D,
-  openSimplexUnoptimized4D,
+  eval2D,
+  eval3D,
+  eval4D,
 };

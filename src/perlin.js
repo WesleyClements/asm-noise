@@ -57,7 +57,7 @@ function Perlin(stdlib, foreign, heap) {
     return (hash & 1 ? x : -x) + (hash & 2 ? y : -y);
   }
 
-  function perlin2D(x, y) {
+  function eval2D(x, y) {
     x = +x;
     y = +y;
     var xi = 0;
@@ -102,7 +102,7 @@ function Perlin(stdlib, foreign, heap) {
     return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
   }
 
-  function perlin3D(x, y, z) {
+  function eval3D(x, y, z) {
     x = +x;
     y = +y;
     z = +z;
@@ -180,7 +180,7 @@ function Perlin(stdlib, foreign, heap) {
     return ((hash & 4) == 0 ? -x : x) + ((hash & 2) == 0 ? -y : y) + ((hash & 1) == 0 ? -z : z);
   }
 
-  function perlin4D(x, y, z, w) {
+  function eval4D(x, y, z, w) {
     x = +x;
     y = +y;
     z = +z;
@@ -299,14 +299,14 @@ function Perlin(stdlib, foreign, heap) {
 
   return {
     setSeed: setSeed,
-    perlin2D: perlin2D,
-    perlin3D: perlin3D,
-    perlin4D: perlin4D,
+    eval2D: eval2D,
+    eval3D: eval3D,
+    eval4D: eval4D,
   };
 }
 
 const heap = new ArrayBuffer(0x10000);
-const { setSeed, perlin2D, perlin3D, perlin4D } = Perlin(
+const { setSeed, eval2D, eval3D, eval4D } = Perlin(
   {
     Math,
     Uint8Array,
@@ -329,7 +329,7 @@ export default {
   get seed() {
     return seed;
   },
-  perlin2D,
-  perlin3D,
-  perlin4D,
+  eval2D,
+  eval3D,
+  eval4D,
 };
