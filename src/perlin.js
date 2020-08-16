@@ -7,8 +7,8 @@ function Perlin(stdlib, foreign, heap) {
 
   var floor = stdlib.Math.floor;
   var _setSeed = foreign.setSeed;
-  var nextUint8 = foreign.nextUint8;
-  var heapUint8 = new stdlib.Uint8Array(heap);
+  var nextU8 = foreign.nextUint8;
+  var heapU8 = new stdlib.Uint8Array(heap);
 
   function setSeed(value) {
     value = value | 0;
@@ -19,16 +19,16 @@ function Perlin(stdlib, foreign, heap) {
     _setSeed(value | 0);
 
     for (i = 0; (i | 0) < 0x100; i = (i + 1) | 0) {
-      heapUint8[i] = i | 0;
+      heapU8[i] = i | 0;
     }
     for (i = 0; (i | 0) < 0x100; i = (i + 1) | 0) {
-      r = nextUint8() | 0;
-      t = heapUint8[i] | 0;
-      heapUint8[i] = heapUint8[r] | 0;
-      heapUint8[r] = heapUint8[t] | 0;
+      r = nextU8() | 0;
+      t = heapU8[i] | 0;
+      heapU8[i] = heapU8[r] | 0;
+      heapU8[r] = heapU8[t] | 0;
     }
     for (i = 0; (i | 0) < 0x100; i = (i + 1) | 0) {
-      heapUint8[(i + 0x100) | 0] = heapUint8[i] | 0;
+      heapU8[(i + 0x100) | 0] = heapU8[i] | 0;
     }
   }
 
@@ -92,13 +92,13 @@ function Perlin(stdlib, foreign, heap) {
     a = +fade(x);
     b = +fade(y);
 
-    A = (heapUint8[xi] + yi) | 0;
-    B = (heapUint8[xi + 1] + yi) | 0;
+    A = (heapU8[xi] + yi) | 0;
+    B = (heapU8[xi + 1] + yi) | 0;
 
     return +normalize(
       +lerp(
-        +lerp(+grad2D(heapUint8[A] | 0, x, y), +grad2D(heapUint8[B] | 0, x - 1.0, y), a),
-        +lerp(+grad2D(heapUint8[A + 1] | 0, x, y - 1.0), +grad2D(heapUint8[B + 1] | 0, x - 1.0, y - 1.0), a),
+        +lerp(+grad2D(heapU8[A] | 0, x, y), +grad2D(heapU8[B] | 0, x - 1.0, y), a),
+        +lerp(+grad2D(heapU8[A + 1] | 0, x, y - 1.0), +grad2D(heapU8[B + 1] | 0, x - 1.0, y - 1.0), a),
         b
       )
     );
@@ -191,25 +191,25 @@ function Perlin(stdlib, foreign, heap) {
     b = +fade(y);
     c = +fade(z);
 
-    A = (heapUint8[xi] + yi) | 0;
-    B = (heapUint8[xi + 1] + yi) | 0;
-    AA = (heapUint8[A] + zi) | 0;
-    BA = (heapUint8[B] + zi) | 0;
-    AB = (heapUint8[A + 1] + zi) | 0;
-    BB = (heapUint8[B + 1] + zi) | 0;
+    A = (heapU8[xi] + yi) | 0;
+    B = (heapU8[xi + 1] + yi) | 0;
+    AA = (heapU8[A] + zi) | 0;
+    BA = (heapU8[B] + zi) | 0;
+    AB = (heapU8[A + 1] + zi) | 0;
+    BB = (heapU8[B + 1] + zi) | 0;
 
     return +normalize(
       +lerp(
         +lerp(
-          +lerp(+grad3D(heapUint8[AA] | 0, x, y, z), +grad3D(heapUint8[BA] | 0, x - 1.0, y, z), a),
-          +lerp(+grad3D(heapUint8[AB] | 0, x, y - 1.0, z), +grad3D(heapUint8[BB] | 0, x - 1.0, y - 1.0, z), a),
+          +lerp(+grad3D(heapU8[AA] | 0, x, y, z), +grad3D(heapU8[BA] | 0, x - 1.0, y, z), a),
+          +lerp(+grad3D(heapU8[AB] | 0, x, y - 1.0, z), +grad3D(heapU8[BB] | 0, x - 1.0, y - 1.0, z), a),
           b
         ),
         +lerp(
-          +lerp(+grad3D(heapUint8[AA + 1] | 0, x, y, z - 1.0), +grad3D(heapUint8[BA + 1] | 0, x - 1.0, y, z - 1.0), a),
+          +lerp(+grad3D(heapU8[AA + 1] | 0, x, y, z - 1.0), +grad3D(heapU8[BA + 1] | 0, x - 1.0, y, z - 1.0), a),
           +lerp(
-            +grad3D(heapUint8[AB + 1] | 0, x, y - 1.0, z - 1.0),
-            +grad3D(heapUint8[BB + 1] | 0, x - 1.0, y - 1.0, z - 1.0),
+            +grad3D(heapU8[AB + 1] | 0, x, y - 1.0, z - 1.0),
+            +grad3D(heapU8[BB + 1] | 0, x - 1.0, y - 1.0, z - 1.0),
             a
           ),
           b
@@ -279,41 +279,33 @@ function Perlin(stdlib, foreign, heap) {
     c = +fade(z);
     d = +fade(w);
 
-    A = (heapUint8[xi] + yi) | 0;
-    B = (heapUint8[xi + 1] + yi) | 0;
-    AA = (heapUint8[A] + zi) | 0;
-    BA = (heapUint8[B] + zi) | 0;
-    AB = (heapUint8[A + 1] + zi) | 0;
-    BB = (heapUint8[B + 1] + zi) | 0;
-    AAA = (heapUint8[AA] + wi) | 0;
-    BAA = (heapUint8[BA] + wi) | 0;
-    ABA = (heapUint8[AB] + wi) | 0;
-    BBA = (heapUint8[BB] + wi) | 0;
-    AAB = (heapUint8[AA + 1] + wi) | 0;
-    BAB = (heapUint8[BA + 1] + wi) | 0;
-    ABB = (heapUint8[AB + 1] + wi) | 0;
-    BBB = (heapUint8[BB + 1] + wi) | 0;
+    A = (heapU8[xi] + yi) | 0;
+    B = (heapU8[xi + 1] + yi) | 0;
+    AA = (heapU8[A] + zi) | 0;
+    BA = (heapU8[B] + zi) | 0;
+    AB = (heapU8[A + 1] + zi) | 0;
+    BB = (heapU8[B + 1] + zi) | 0;
+    AAA = (heapU8[AA] + wi) | 0;
+    BAA = (heapU8[BA] + wi) | 0;
+    ABA = (heapU8[AB] + wi) | 0;
+    BBA = (heapU8[BB] + wi) | 0;
+    AAB = (heapU8[AA + 1] + wi) | 0;
+    BAB = (heapU8[BA + 1] + wi) | 0;
+    ABB = (heapU8[AB + 1] + wi) | 0;
+    BBB = (heapU8[BB + 1] + wi) | 0;
     return +normalize(
       +lerp(
         +lerp(
           +lerp(
-            +lerp(+grad4D(heapUint8[AAA] | 0, x, y, z, w), +grad4D(heapUint8[BAA] | 0, x - 1.0, y, z, w), a),
-            +lerp(
-              +grad4D(heapUint8[ABA] | 0, x, y - 1.0, z, w),
-              +grad4D(heapUint8[BBA] | 0, x - 1.0, y - 1.0, z, w),
-              a
-            ),
+            +lerp(+grad4D(heapU8[AAA] | 0, x, y, z, w), +grad4D(heapU8[BAA] | 0, x - 1.0, y, z, w), a),
+            +lerp(+grad4D(heapU8[ABA] | 0, x, y - 1.0, z, w), +grad4D(heapU8[BBA] | 0, x - 1.0, y - 1.0, z, w), a),
             b
           ),
           +lerp(
+            +lerp(+grad4D(heapU8[AAB] | 0, x, y, z - 1.0, w), +grad4D(heapU8[BAB] | 0, x - 1.0, y, z - 1.0, w), a),
             +lerp(
-              +grad4D(heapUint8[AAB] | 0, x, y, z - 1.0, w),
-              +grad4D(heapUint8[BAB] | 0, x - 1.0, y, z - 1.0, w),
-              a
-            ),
-            +lerp(
-              +grad4D(heapUint8[ABB] | 0, x, y - 1.0, z - 1.0, w),
-              +grad4D(heapUint8[BBB] | 0, x - 1.0, y - 1.0, z - 1.0, w),
+              +grad4D(heapU8[ABB] | 0, x, y - 1.0, z - 1.0, w),
+              +grad4D(heapU8[BBB] | 0, x - 1.0, y - 1.0, z - 1.0, w),
               a
             ),
             b
@@ -323,26 +315,26 @@ function Perlin(stdlib, foreign, heap) {
         +lerp(
           +lerp(
             +lerp(
-              +grad4D(heapUint8[AAA + 1] | 0, x, y, z, w - 1.0),
-              +grad4D(heapUint8[BAA + 1] | 0, x - 1.0, y, z, w - 1.0),
+              +grad4D(heapU8[AAA + 1] | 0, x, y, z, w - 1.0),
+              +grad4D(heapU8[BAA + 1] | 0, x - 1.0, y, z, w - 1.0),
               a
             ),
             +lerp(
-              +grad4D(heapUint8[ABA + 1] | 0, x, y - 1.0, z, w - 1.0),
-              +grad4D(heapUint8[BBA + 1] | 0, x - 1.0, y - 1.0, z, w - 1.0),
+              +grad4D(heapU8[ABA + 1] | 0, x, y - 1.0, z, w - 1.0),
+              +grad4D(heapU8[BBA + 1] | 0, x - 1.0, y - 1.0, z, w - 1.0),
               a
             ),
             b
           ),
           +lerp(
             +lerp(
-              +grad4D(heapUint8[AAB + 1] | 0, x, y, z - 1.0, w - 1.0),
-              +grad4D(heapUint8[BAB + 1] | 0, x - 1.0, y, z - 1.0, w - 1.0),
+              +grad4D(heapU8[AAB + 1] | 0, x, y, z - 1.0, w - 1.0),
+              +grad4D(heapU8[BAB + 1] | 0, x - 1.0, y, z - 1.0, w - 1.0),
               a
             ),
             +lerp(
-              +grad4D(heapUint8[ABB + 1] | 0, x, y - 1.0, z - 1.0, w - 1.0),
-              +grad4D(heapUint8[BBB + 1] | 0, x - 1.0, y - 1.0, z - 1.0, w - 1.0),
+              +grad4D(heapU8[ABB + 1] | 0, x, y - 1.0, z - 1.0, w - 1.0),
+              +grad4D(heapU8[BBB + 1] | 0, x - 1.0, y - 1.0, z - 1.0, w - 1.0),
               a
             ),
             b

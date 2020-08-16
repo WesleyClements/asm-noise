@@ -6,9 +6,9 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
   var floor = stdlib.Math.floor;
 
   var _setSeed = foreign.setSeed;
-  var nextUint32 = foreign.nextUint32;
+  var nextU32 = foreign.nextUint32;
 
-  var heapUint16 = new stdlib.Uint16Array(heap);
+  var heapU16 = new stdlib.Uint16Array(heap);
   var heapF64 = new stdlib.Float64Array(heap);
 
   var pSize = 0x800;
@@ -47,19 +47,19 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
     _setSeed(value);
 
     for (i = 0; (i | 0) < (pSize | 0); i = (i + 1) | 0) {
-      heapUint16[(perm + (i << 1)) >> 1] = i;
+      heapU16[(perm + (i << 1)) >> 1] = i;
     }
     for (i = 0; (i | 0) < (pSize | 0); i = (i + 1) | 0) {
-      r = (nextUint32() | 0) & pMask;
+      r = (nextU32() | 0) & pMask;
       temp = getPerm(i) | 0;
-      heapUint16[(perm + (i << 1)) >> 1] = getPerm(r) | 0;
-      heapUint16[(perm + (r << 1)) >> 1] = temp;
+      heapU16[(perm + (i << 1)) >> 1] = getPerm(r) | 0;
+      heapU16[(perm + (r << 1)) >> 1] = temp;
     }
   }
 
   function getPerm(i) {
     i = i | 0;
-    return heapUint16[(perm + (i << 1)) >> 1] | 0;
+    return heapU16[(perm + (i << 1)) >> 1] | 0;
   }
 
   function grad2D(xsb, ysb, dx, dy) {
