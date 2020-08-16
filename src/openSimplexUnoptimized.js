@@ -945,7 +945,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
     var ws = 0.0;
 
     // Get points for A4 lattice
-    s = -0.138196601125011 * (x + y + z + w);
+    s = heapF64[stretchConstant4D >> 3] * (x + y + z + w);
     xs = x + s;
     ys = y + s;
     zs = z + s;
@@ -1013,7 +1013,7 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
 
     xyz = x + y + z;
     ww = w * 0.2236067977499788;
-    s2 = xyz * -0.16666666666666666 + ww;
+    s2 = xyz * heapF64[stretchConstant3D >> 3] + ww;
     xs = x + s2;
     ys = y + s2;
     zs = z + s2;
