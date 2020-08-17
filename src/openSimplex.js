@@ -52,12 +52,6 @@ function OpenSimplex(stdlib, foreign, heap) {
     return (n + 1.0) / 2.0;
   }
 
-  function trunc(n) {
-    n = +n;
-    if (n < 0.0) return ~~ceil(n);
-    return ~~floor(n);
-  }
-
   function setSeed(value) {
     value = +value;
     var i = 0;
@@ -139,13 +133,8 @@ function OpenSimplex(stdlib, foreign, heap) {
     dx0 = xins + squishOffsetIns;
     dy0 = yins + squishOffsetIns;
 
-    // prettier-ignore
-    hash = (
-      (trunc(xins - yins + 1.0) | 0) |
-      ((trunc(inSum) | 0) << 1) |
-      ((trunc(inSum + yins) | 0) << 2) |
-      ((trunc(inSum + xins) | 0) << 4)
-    );
+    hash =
+      ~~floor(xins - yins + 1.0) | (~~floor(inSum) << 1) | (~~floor(inSum + yins) << 2) | (~~floor(inSum + xins) << 4);
 
     cSet = heapU32[(lookUp2D + (hash << 2)) >> 2] << 2;
 
