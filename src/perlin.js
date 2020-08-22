@@ -2,12 +2,11 @@ import random from './random.js';
 
 function Perlin(stdlib, foreign, heap) {
   'use asm';
-  var SQRT2 = stdlib.Math.SQRT2;
-  var SQRT1_2 = stdlib.Math.SQRT1_2;
-
   var floor = stdlib.Math.floor;
+
   var _setSeed = foreign.setSeed;
   var nextU8 = foreign.nextUint8;
+
   var heapU8 = new stdlib.Uint8Array(heap);
 
   function setSeed(value) {
