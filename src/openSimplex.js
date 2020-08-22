@@ -4,11 +4,9 @@ function OpenSimplex(stdlib, foreign, heap) {
   'use asm';
   var imul = stdlib.Math.imul;
   var floor = stdlib.Math.floor;
-  var ceil = stdlib.Math.ceil;
 
   var _setSeed = foreign.setSeed;
   var nextU32 = foreign.nextUint32;
-  var print = foreign.print;
 
   var heapU16 = new stdlib.Uint16Array(heap);
   var heapU32 = new stdlib.Uint32Array(heap);
@@ -28,7 +26,9 @@ function OpenSimplex(stdlib, foreign, heap) {
   var ZI = 0x8;
   var WI = 0xc;
 
-  var contribution2D = 0x18;
+  var contribution2D = 0x18; // 2 * 8 bytes + 2 * 4 bytes
+  var contribution3D = 0x28; // 3 * 8 bytes + 3 * 4 bytes
+  var contribution4D = 0x30; // 4 * 8 bytes + 4 * 4 bytes
 
   var perm = 0x0; // 2048 permutations * 2 byte
 
@@ -46,6 +46,9 @@ function OpenSimplex(stdlib, foreign, heap) {
 
   var lookUp2D = 0x25030; // 64 * 4 bytes
   var contributions2D = 0x25130; // 24 * (2 * 8 bytes + 2 * 4 bytes)
+
+  var lookUp3D = 0x25370; // 2048 * 4 bytes
+  var contributions3D = 0x27370; // 8*24 * (3 * 4 bytes + 3 * 8 bytes)
 
   function normalize(n) {
     n = +n;
@@ -102,7 +105,7 @@ function OpenSimplex(stdlib, foreign, heap) {
     var dx0 = 0.0;
     var dy0 = 0.0;
     var hash = 0;
-    var cSet = 0;
+    var offset = 0;
     var i = 0;
     var c = 0;
     var dx = 0.0;
@@ -112,40 +115,39 @@ function OpenSimplex(stdlib, foreign, heap) {
     var attn = 0.0;
     var value = 0.0;
 
-    // Place input coordinates onto grid.
     stretchOffset = (x + y) * heapF64[stretchConstant2D >> 3];
     xs = x + stretchOffset;
     ys = y + stretchOffset;
 
-    // Floor to get grid coordinates of rhombus (stretched square) super-cell origin.
     xsb = ~~floor(xs);
     ysb = ~~floor(ys);
 
-    // Compute grid coordinates relative to rhombus origin.
     xins = xs - +(xsb | 0);
     yins = ys - +(ysb | 0);
 
-    // Sum those together to get a value that determines which region we're in.
     inSum = xins + yins;
 
-    // Positions relative to origin point.
     squishOffsetIns = inSum * heapF64[squishConstant2D >> 3];
     dx0 = xins + squishOffsetIns;
     dy0 = yins + squishOffsetIns;
 
-    hash =
-      ~~floor(xins - yins + 1.0) | (~~floor(inSum) << 1) | (~~floor(inSum + yins) << 2) | (~~floor(inSum + xins) << 4);
+    // prettier-ignore
+    hash = 
+      ~~floor(xins - yins + 1.0) |
+      (~~floor(inSum) << 1) |
+      (~~floor(inSum + yins) << 2) |
+      (~~floor(inSum + xins) << 4);
 
-    cSet = heapU32[(lookUp2D + (hash << 2)) >> 2] << 2;
+    offset = imul(contribution2D, heapU32[(lookUp2D + (hash << 2)) >> 2] | 0) << 2;
 
     for (i = 0; (i | 0) < 4; i = (i + 1) | 0) {
-      c = imul(contribution2D, (i + cSet) | 0);
-      dx = dx0 + +heapF64[(contributions2D + c + X) >> 3];
-      dy = dy0 + +heapF64[(contributions2D + c + Y) >> 3];
+      c = imul(contribution2D, i);
+      dx = dx0 + +heapF64[(contributions2D + offset + c + X) >> 3];
+      dy = dy0 + +heapF64[(contributions2D + offset + c + Y) >> 3];
       attn = 2.0 - dx * dx - dy * dy;
       if (attn > 0.0) {
-        px = xsb + heapI32[(contributions2D + c + 0x10 + XI) >> 2];
-        py = ysb + heapI32[(contributions2D + c + 0x10 + YI) >> 2];
+        px = xsb + heapI32[(contributions2D + offset + c + 0x10 + XI) >> 2];
+        py = ysb + heapI32[(contributions2D + offset + c + 0x10 + YI) >> 2];
 
         attn = attn * attn;
         value = value + attn * attn * +grad2D(px, py, dx, dy);
@@ -154,9 +156,161 @@ function OpenSimplex(stdlib, foreign, heap) {
     return +normalize(value);
   }
 
+  function grad3D(xsb, ysb, zsb, dx, dy, dz) {
+    xsb = xsb | 0;
+    ysb = ysb | 0;
+    zsb = zsb | 0;
+    dx = +dx;
+    dy = +dy;
+    dz = +dz;
+    var i = 0;
+    i = (getPerm(xsb & pMask) | 0) ^ (ysb & pMask);
+    i = (getPerm(i) | 0) ^ (zsb & pMask);
+    i = getPerm(i) | 0;
+    i = imul(i, 3);
+    return (
+      +heapF64[(gradients3D + (i << 3) + X) >> 3] * dx +
+      +heapF64[(gradients3D + (i << 3) + Y) >> 3] * dy +
+      +heapF64[(gradients3D + (i << 3) + Z) >> 3] * dz
+    );
+  }
+
+  function eval3D(x, y, z) {
+    x = +x;
+    y = +y;
+    z = +z;
+    var stretchOffset = 0.0;
+    var xs = 0.0;
+    var ys = 0.0;
+    var zs = 0.0;
+
+    stretchOffset = (x + y + z) * heapF64[stretchConstant3D >> 3];
+    xs = x + stretchOffset;
+    ys = y + stretchOffset;
+    zs = z + stretchOffset;
+
+    return +eval3DBase(xs, ys, zs);
+  }
+
+  function eval3DXYBeforeZ(x, y, z) {
+    x = +x;
+    y = +y;
+    z = +z;
+    var xy = 0.0;
+    var s2 = 0.0;
+    var zz = 0.0;
+    var xs = 0.0;
+    var ys = 0.0;
+    var zs = 0.0;
+    xy = x + y;
+    s2 = xy * -heapF64[stretchConstant2D >> 3];
+    zz = z * 0.288675134594813;
+    xs = s2 - x + zz;
+    ys = s2 - y + zz;
+    zs = xy * 0.577350269189626 + zz;
+
+    return +eval3DBase(xs, ys, zs);
+  }
+
+  function eval3DXZBeforeY(x, y, z) {
+    x = +x;
+    y = +y;
+    z = +z;
+    var xz = 0.0;
+    var s2 = 0.0;
+    var yy = 0.0;
+    var xs = 0.0;
+    var ys = 0.0;
+    var zs = 0.0;
+    xz = x + z;
+    s2 = xz * -heapF64[stretchConstant2D >> 3];
+    yy = y * 0.288675134594813;
+    xs = s2 - x + yy;
+    ys = xz * 0.577350269189626 + yy;
+    zs = s2 - z + yy;
+
+    return +eval3DBase(xs, ys, zs);
+  }
+
+  function eval3DBase(xs, ys, zs) {
+    xs = +xs;
+    ys = +ys;
+    zs = +zs;
+    var xsb = 0;
+    var ysb = 0;
+    var zsb = 0;
+    var xins = 0.0;
+    var yins = 0.0;
+    var zins = 0.0;
+    var inSum = 0.0;
+    var squishOffsetIns = 0.0;
+    var dx0 = 0.0;
+    var dy0 = 0.0;
+    var dz0 = 0.0;
+    var hash = 0;
+    var offset = 0;
+    var length = 0;
+    var i = 0;
+    var c = 0;
+    var dx = 0.0;
+    var dy = 0.0;
+    var dz = 0.0;
+    var px = 0;
+    var py = 0;
+    var pz = 0;
+    var attn = 0.0;
+    var value = 0.0;
+
+    xsb = ~~floor(xs);
+    ysb = ~~floor(ys);
+    zsb = ~~floor(zs);
+
+    xins = xs - +(xsb | 0);
+    yins = ys - +(ysb | 0);
+    zins = zs - +(zsb | 0);
+
+    inSum = xins + yins + zins;
+
+    squishOffsetIns = inSum * heapF64[squishConstant3D >> 3];
+    dx0 = xins + squishOffsetIns;
+    dy0 = yins + squishOffsetIns;
+    dz0 = zins + squishOffsetIns;
+
+    hash =
+      ~~floor(yins - zins + 1.0) |
+      (~~floor(xins - yins + 1.0) << 1) |
+      (~~floor(xins - zins + 1.0) << 2) |
+      (~~floor(inSum) << 3) |
+      (~~floor(inSum + zins) << 5) |
+      (~~floor(inSum + yins) << 7) |
+      (~~floor(inSum + xins) << 9);
+
+    offset = imul((1 + contribution3D) | 0, heapU32[(lookUp3D + (hash << 2)) >> 2] | 0) << 3;
+    length = heapU32[(contributions3D + offset) >> 2] | 0;
+    offset = (offset + 0x8) | 0;
+
+    for (i = 0; (i | 0) < (length | 0); i = (i + 1) | 0) {
+      c = imul(contribution3D, i);
+      dx = dx0 + +heapF64[(contributions3D + offset + c + X) >> 3];
+      dy = dy0 + +heapF64[(contributions3D + offset + c + Y) >> 3];
+      dz = dz0 + +heapF64[(contributions3D + offset + c + Z) >> 3];
+      attn = 2.0 - dx * dx - dy * dy - dz * dz;
+      if (attn > 0.0) {
+        px = xsb + heapI32[(contributions3D + offset + c + 0x18 + XI) >> 2];
+        py = ysb + heapI32[(contributions3D + offset + c + 0x18 + YI) >> 2];
+        pz = zsb + heapI32[(contributions3D + offset + c + 0x18 + ZI) >> 2];
+
+        attn = attn * attn;
+        value = value + attn * attn * +grad3D(px, py, pz, dx, dy, dz);
+      }
+    }
+    return +normalize(value);
+  }
+
   return {
     setSeed: setSeed,
     eval2D: eval2D,
+    eval3D: eval3D,
   };
 }
 
@@ -453,20 +607,20 @@ const heap = new ArrayBuffer(0x100000);
   let offset64 = 0;
   {
     const lookupPairs2D = [0, 1, 1, 0, 4, 1, 17, 0, 20, 2, 21, 2, 22, 5, 23, 5, 26, 4, 39, 3, 42, 4, 43, 3];
-    for (let i = 0; i < lookupPairs2D.length / 2; ++i) {
-      heapU32[lookupPairs2D[i << 1]] = lookupPairs2D[(i << 1) + 1];
+    for (let i = 0; i < lookupPairs2D.length; i += 2) {
+      heapU32[offset32 + lookupPairs2D[i]] = lookupPairs2D[i + 1];
     }
-
-    offset32 += 64;
+    offset32 += 32 * 2;
     offset64 += 32;
 
     const squish2D = (Math.sqrt(2 + 1) - 1) / 2;
-    function setContribution2D(i, multiplier, xsb, ysb) {
-      i *= 3;
-      heapF64[offset64 + i] = -xsb - multiplier * squish2D;
-      heapF64[offset64 + i + 1] = -ysb - multiplier * squish2D;
-      heapI32[offset32 + 2 * i + 2 * 2] = xsb;
-      heapI32[offset32 + 2 * i + 2 * 2 + 1] = ysb;
+    function setContribution2D(multiplier, xsb, ysb) {
+      heapF64[offset64] = -xsb - multiplier * squish2D;
+      heapF64[offset64 + 1] = -ysb - multiplier * squish2D;
+      heapI32[offset32 + 2 * 2] = xsb;
+      heapI32[offset32 + 2 * 2 + 1] = ysb;
+      offset32 += 3 * 2;
+      offset64 += 3;
     }
 
     const base2D = [
@@ -475,16 +629,63 @@ const heap = new ArrayBuffer(0x100000);
     ];
     const p2D = [0, 0, 1, -1, 0, 0, -1, 1, 0, 2, 1, 1, 1, 2, 2, 0, 1, 2, 0, 2, 1, 0, 0, 0];
     for (let i = 0; i < p2D.length; i += 4) {
+      let offset = i;
       const baseSet = base2D[p2D[i]];
       for (let k = 0; k < baseSet.length; k += 3) {
-        setContribution2D(i + k / 3, baseSet[k], baseSet[k + 1], baseSet[k + 2]);
+        setContribution2D(baseSet[k], baseSet[k + 1], baseSet[k + 2]);
+        offset++;
       }
-      setContribution2D(i + 3, p2D[i + 1], p2D[i + 2], p2D[i + 3]);
+      setContribution2D(p2D[i + 1], p2D[i + 2], p2D[i + 3]);
+    }
+  }
+
+  {
+    // prettier-ignore
+    const lookupPairs3D = [0, 2, 1, 1, 2, 2, 5, 1, 6, 0, 7, 0, 32, 2, 34, 2, 129, 1, 133, 1, 160, 5, 161, 5, 518, 0, 519, 0, 546, 4, 550, 4, 645, 3, 647, 3, 672, 5, 673, 5, 674, 4, 677, 3, 678, 4, 679, 3, 680, 13, 681, 13, 682, 12, 685, 14, 686, 12, 687, 14, 712, 20, 714, 18, 809, 21, 813, 23, 840, 20, 841, 21, 1198, 19, 1199, 22, 1226, 18, 1230, 19, 1325, 23, 1327, 22, 1352, 15, 1353, 17, 1354, 15, 1357, 17, 1358, 16, 1359, 16, 1360, 11, 1361, 10, 1362, 11, 1365, 10, 1366, 9, 1367, 9, 1392, 11, 1394, 11, 1489, 10, 1493, 10, 1520, 8, 1521, 8, 1878, 9, 1879, 9, 1906, 7, 1910, 7, 2005, 6, 2007, 6, 2032, 8, 2033, 8, 2034, 7, 2037, 6, 2038, 7, 2039, 6];
+    for (let i = 0; i < lookupPairs3D.length; i += 2) {
+      heapU32[offset32 + lookupPairs3D[i]] = lookupPairs3D[i + 1];
+    }
+
+    offset32 += 2048;
+    offset64 += 1024;
+
+    const base3D = [
+      [0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1],
+      [2, 1, 1, 0, 2, 1, 0, 1, 2, 0, 1, 1, 3, 1, 1, 1],
+      [1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 2, 1, 1, 0, 2, 1, 0, 1, 2, 0, 1, 1],
+    ];
+    // prettier-ignore
+    const p3D = [0, 0, 1, -1, 0, 0, 1, 0, -1, 0, 0, -1, 1, 0, 0, 0, 1, -1, 0, 0, -1, 0, 1, 0, 0, -1, 1, 0, 2, 1, 1, 0, 1, 1, 1, -1, 0, 2, 1, 0, 1, 1, 1, -1, 1, 0, 2, 0, 1, 1, 1, -1, 1, 1, 1, 3, 2, 1, 0, 3, 1, 2, 0, 1, 3, 2, 0, 1, 3, 1, 0, 2, 1, 3, 0, 2, 1, 3, 0, 1, 2, 1, 1, 1, 0, 0, 2, 2, 0, 0, 1, 1, 0, 1, 0, 2, 0, 2, 0, 1, 1, 0, 0, 1, 2, 0, 0, 2, 2, 0, 0, 0, 0, 1, 1, -1, 1, 2, 0, 0, 0, 0, 1, -1, 1, 1, 2, 0, 0, 0, 0, 1, 1, 1, -1, 2, 3, 1, 1, 1, 2, 0, 0, 2, 2, 3, 1, 1, 1, 2, 2, 0, 0, 2, 3, 1, 1, 1, 2, 0, 2, 0, 2, 1, 1, -1, 1, 2, 0, 0, 2, 2, 1, 1, -1, 1, 2, 2, 0, 0, 2, 1, -1, 1, 1, 2, 0, 0, 2, 2, 1, -1, 1, 1, 2, 0, 2, 0, 2, 1, 1, 1, -1, 2, 2, 0, 0, 2, 1, 1, 1, -1, 2, 0, 2, 0];
+
+    const squish3D = (Math.sqrt(3 + 1) - 1) / 3;
+    function setContribution3D(multiplier, xsb, ysb, zsb) {
+      heapF64[offset64 + 0] = -xsb - multiplier * squish3D;
+      heapF64[offset64 + 1] = -ysb - multiplier * squish3D;
+      heapF64[offset64 + 2] = -zsb - multiplier * squish3D;
+      heapI32[offset32 + 3 * 2 + 0] = xsb;
+      heapI32[offset32 + 3 * 2 + 1] = ysb;
+      heapI32[offset32 + 3 * 2 + 2] = zsb;
+      offset32 += 5 * 2;
+      offset64 += 5;
+    }
+
+    for (let i = 0; i < p3D.length; i += 9) {
+      const baseSet = base3D[p3D[i]];
+      const length = baseSet.length / 4 + 2;
+      heapU32[offset32] = length;
+      offset32 += 1 * 2;
+      offset64 += 1;
+      for (let k = 0; k < baseSet.length; k += 4)
+        setContribution3D(baseSet[k], baseSet[k + 1], baseSet[k + 2], baseSet[k + 3]);
+      setContribution3D(p3D[i + 1], p3D[i + 2], p3D[i + 3], p3D[i + 4]);
+      setContribution3D(p3D[i + 5], p3D[i + 6], p3D[i + 7], p3D[i + 8]);
+      offset32 += 5 * 2 * (8 - length);
+      offset64 += 5 * (8 - length);
     }
   }
 }
 
-const { setSeed, eval2D } = OpenSimplex(
+const { setSeed, eval2D, eval3D } = OpenSimplex(
   {
     Math,
     Uint16Array,
@@ -514,4 +715,5 @@ export default {
     return seed;
   },
   eval2D,
+  eval3D,
 };
