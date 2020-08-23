@@ -1,9 +1,12 @@
 {
   "name": "fast-noise",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "An implementation of noise algorithms in asm.js.",
-  "main": "index.js",
+  "main": "dist/fast-noise.js",
+  "module": "src/index.js",
   "scripts": {
+    "start": "webpack-dev-server --open --config webpack/webpack.development.js",
+    "build": "webpack --config webpack/webpack.production.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,5 +18,14 @@
   "bugs": {
     "url": "https://github.com/WesleyClements/fast-noise/issues"
   },
-  "homepage": "https://github.com/WesleyClements/fast-noise#readme"
+  "homepage": "https://github.com/WesleyClements/fast-noise#readme",
+  "devDependencies": {
+    "@babel/core": "^7.11.4",
+    "@babel/preset-env": "^7.11.0",
+    "babel-loader": "^8.1.0",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0",
+    "webpack-merge": "^5.1.2"
+  }
 }
