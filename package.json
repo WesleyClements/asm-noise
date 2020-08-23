@@ -2,8 +2,8 @@
   "name": "asm-noise",
   "version": "0.1.0",
   "description": "An implementation of noise algorithms in asm.js.",
-  "main": "dist/asm-noise.js",
-  "module": "src/index.js",
+  "main": "./umd/asm-noise.js",
+  "module": "./src/index.js",
   "scripts": {
     "start": "webpack-dev-server --open --config webpack/webpack.development.js",
     "build": "webpack --config webpack/webpack.production.js",
@@ -13,12 +13,29 @@
     "type": "git",
     "url": "git+https://github.com/WesleyClements/asm-noise.git"
   },
-  "author": "Wesley Clements",
+  "keywords": [
+    "fast",
+    "noise",
+    "function",
+    "asm-noise",
+    "procedural",
+    "generation",
+    "generator",
+    "generate",
+    "2d",
+    "3d",
+    "4d"
+  ],
+  "author": "Wesley Clements <wesley.clements@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/WesleyClements/asm-noise/issues"
   },
   "homepage": "https://github.com/WesleyClements/asm-noise#readme",
+  "files": [
+    "umd/",
+    "src/"
+  ],
   "devDependencies": {
     "@babel/core": "^7.11.4",
     "@babel/preset-env": "^7.11.0",
