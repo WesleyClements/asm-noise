@@ -5,6 +5,7 @@
   "main": "./dist/asm-noise.js",
   "module": "./src/index.js",
   "unpkg": "./dist/asm-noise.js",
+  "types": "./src/index.d.ts",
   "scripts": {
     "start": "webpack-dev-server --open --config webpack/webpack.development.js",
     "build": "webpack --config webpack/webpack.production.js",
