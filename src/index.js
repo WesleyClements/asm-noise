@@ -1,5 +1,4 @@
 import perlin from './perlin.js';
-import openSimplex from './openSimplex.js';
 import openSimplexUnoptimized from './openSimplexUnoptimized.js';
 
 export let noise;
