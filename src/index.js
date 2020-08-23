@@ -115,5 +115,3 @@ let noise;
 }
 
 export default noise;
-
-module.exports = noise;
