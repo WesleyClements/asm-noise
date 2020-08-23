@@ -1,8 +1,8 @@
 {
-  "name": "fast-noise",
+  "name": "asm-noise",
   "version": "0.1.0",
   "description": "An implementation of noise algorithms in asm.js.",
-  "main": "dist/fast-noise.js",
+  "main": "dist/asm-noise.js",
   "module": "src/index.js",
   "scripts": {
     "start": "webpack-dev-server --open --config webpack/webpack.development.js",
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/WesleyClements/fast-noise.git"
+    "url": "git+https://github.com/WesleyClements/asm-noise.git"
   },
   "author": "Wesley Clements",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/WesleyClements/fast-noise/issues"
+    "url": "https://github.com/WesleyClements/asm-noise/issues"
   },
-  "homepage": "https://github.com/WesleyClements/fast-noise#readme",
+  "homepage": "https://github.com/WesleyClements/asm-noise#readme",
   "devDependencies": {
     "@babel/core": "^7.11.4",
     "@babel/preset-env": "^7.11.0",

@@ -4,8 +4,8 @@ module.exports = {
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, '../dist'),
-    filename: 'fast-noise.js',
-    library: 'fastNoise',
+    filename: 'asm-noise.js',
+    library: 'asmNoise',
     libraryExport: 'noise',
     libraryTarget: 'umd',
     globalObject: 'this',
