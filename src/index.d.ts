@@ -5,7 +5,7 @@
 export as namespace asmNoise;
 
 declare module asmNoise {
-  export = Noise;
+  export default Noise;
 
   declare function Noise(x: number, y: number): number;
   declare function Noise(x: number, y: number, z: number): number;
