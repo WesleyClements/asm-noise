@@ -52,6 +52,30 @@ function Perlin(stdlib, foreign, heap) {
     return (n + 1.0) / 2.0;
   }
 
+  function noise2D(octaves, lacunarity, persistence, xOffset, yOffset, x, y) {
+    octaves = octaves | 0;
+    lacunarity = +lacunarity;
+    persistence = +persistence;
+    xOffset = +xOffset;
+    yOffset = +yOffset;
+    x = +x;
+    y = +y;
+    var total = 0.0;
+    var frequency = 1.0;
+    var amplitude = 1.0;
+    var max = 0.0;
+    var i = 0;
+    for (i = 0; (i | 0) < (octaves | 0); i = (i + 1) | 0) {
+      total = total + +eval2D(x * frequency, y * frequency) * amplitude;
+      max = max + amplitude;
+      frequency = frequency * lacunarity;
+      amplitude = amplitude * persistence;
+      x = x + xOffset;
+      y = y + yOffset;
+    }
+    return total / max;
+  }
+
   function grad2D(hash, x, y) {
     hash = hash | 0;
     x = +x;
@@ -101,6 +125,33 @@ function Perlin(stdlib, foreign, heap) {
         b
       )
     );
+  }
+
+  function noise3D(octaves, lacunarity, persistence, xOffset, yOffset, zOffset, x, y, z) {
+    octaves = octaves | 0;
+    lacunarity = +lacunarity;
+    persistence = +persistence;
+    xOffset = +xOffset;
+    yOffset = +yOffset;
+    zOffset = +zOffset;
+    x = +x;
+    y = +y;
+    z = +z;
+    var total = 0.0;
+    var frequency = 1.0;
+    var amplitude = 1.0;
+    var max = 0.0;
+    var i = 0;
+    for (i = 0; (i | 0) < (octaves | 0); i = (i + 1) | 0) {
+      total = total + +eval3D(x * frequency, y * frequency, z * frequency) * amplitude;
+      max = max + amplitude;
+      frequency = frequency * lacunarity;
+      amplitude = amplitude * persistence;
+      x = x + xOffset;
+      y = y + yOffset;
+      z = z + yOffset;
+    }
+    return total / max;
   }
 
   function grad3D(hash, x, y, z) {
@@ -216,6 +267,36 @@ function Perlin(stdlib, foreign, heap) {
         c
       )
     );
+  }
+
+  function noise4D(octaves, lacunarity, persistence, xOffset, yOffset, zOffset, wOffset, x, y, z, w) {
+    octaves = octaves | 0;
+    lacunarity = +lacunarity;
+    persistence = +persistence;
+    xOffset = +xOffset;
+    yOffset = +yOffset;
+    zOffset = +zOffset;
+    wOffset = +wOffset;
+    x = +x;
+    y = +y;
+    z = +z;
+    w = +w;
+    var total = 0.0;
+    var frequency = 1.0;
+    var amplitude = 1.0;
+    var max = 0.0;
+    var i = 0;
+    for (i = 0; (i | 0) < (octaves | 0); i = (i + 1) | 0) {
+      total = total + +eval4D(x * frequency, y * frequency, z * frequency, w * frequency) * amplitude;
+      max = max + amplitude;
+      frequency = frequency * lacunarity;
+      amplitude = amplitude * persistence;
+      x = x + xOffset;
+      y = y + yOffset;
+      z = z + yOffset;
+      w = w + yOffset;
+    }
+    return total / max;
   }
 
   function grad4D(hash, x, y, z, w) {
@@ -347,14 +428,14 @@ function Perlin(stdlib, foreign, heap) {
 
   return {
     setSeed: setSeed,
-    eval2D: eval2D,
-    eval3D: eval3D,
-    eval4D: eval4D,
+    noise2D: noise2D,
+    noise3D: noise3D,
+    noise4D: noise4D,
   };
 }
 
 const heap = new ArrayBuffer(0x10000);
-const { setSeed, eval2D, eval3D, eval4D } = Perlin(
+const { setSeed, noise2D, noise3D, noise4D } = Perlin(
   {
     Math,
     Uint8Array,
@@ -377,7 +458,7 @@ export default {
   get seed() {
     return seed;
   },
-  eval2D,
-  eval3D,
-  eval4D,
+  noise2D,
+  noise3D,
+  noise4D,
 };

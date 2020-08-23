@@ -62,6 +62,30 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
     return heapU16[(perm + (i << 1)) >> 1] | 0;
   }
 
+  function noise2D(octaves, lacunarity, persistence, xOffset, yOffset, x, y) {
+    octaves = octaves | 0;
+    lacunarity = +lacunarity;
+    persistence = +persistence;
+    xOffset = +xOffset;
+    yOffset = +yOffset;
+    x = +x;
+    y = +y;
+    var total = 0.0;
+    var frequency = 1.0;
+    var amplitude = 1.0;
+    var max = 0.0;
+    var i = 0;
+    for (i = 0; (i | 0) < (octaves | 0); i = (i + 1) | 0) {
+      total = total + +eval2D(x * frequency, y * frequency) * amplitude;
+      max = max + amplitude;
+      frequency = frequency * lacunarity;
+      amplitude = amplitude * persistence;
+      x = x + xOffset;
+      y = y + yOffset;
+    }
+    return total / max;
+  }
+
   function grad2D(xsb, ysb, dx, dy) {
     xsb = xsb | 0;
     ysb = ysb | 0;
@@ -209,23 +233,31 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
     return +normalize(value);
   }
 
-  function grad3D(xsb, ysb, zsb, dx, dy, dz) {
-    xsb = xsb | 0;
-    ysb = ysb | 0;
-    zsb = zsb | 0;
-    dx = +dx;
-    dy = +dy;
-    dz = +dz;
+  function noise3D(octaves, lacunarity, persistence, xOffset, yOffset, zOffset, x, y, z) {
+    octaves = octaves | 0;
+    lacunarity = +lacunarity;
+    persistence = +persistence;
+    xOffset = +xOffset;
+    yOffset = +yOffset;
+    zOffset = +zOffset;
+    x = +x;
+    y = +y;
+    z = +z;
+    var total = 0.0;
+    var frequency = 1.0;
+    var amplitude = 1.0;
+    var max = 0.0;
     var i = 0;
-    i = (getPerm(xsb & pMask) | 0) ^ (ysb & pMask);
-    i = (getPerm(i) | 0) ^ (zsb & pMask);
-    i = getPerm(i) | 0;
-    i = imul(i, 3);
-    return (
-      +heapF64[(gradients3D + (i << 3) + X) >> 3] * dx +
-      +heapF64[(gradients3D + (i << 3) + Y) >> 3] * dy +
-      +heapF64[(gradients3D + (i << 3) + Z) >> 3] * dz
-    );
+    for (i = 0; (i | 0) < (octaves | 0); i = (i + 1) | 0) {
+      total = total + +eval3D(x * frequency, y * frequency, z * frequency) * amplitude;
+      max = max + amplitude;
+      frequency = frequency * lacunarity;
+      amplitude = amplitude * persistence;
+      x = x + xOffset;
+      y = y + yOffset;
+      z = z + yOffset;
+    }
+    return total / max;
   }
 
   function eval3D(x, y, z) {
@@ -246,52 +278,67 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
     return +eval3DBase(xs, ys, zs);
   }
 
-  // Not as good as in SuperSimplex/OpenSimplex2S, since there are more visible differences between different slices.
-  // The Z coordinate should always be the "different" coordinate in your use case.
-  function eval3DXYBeforeZ(x, y, z) {
-    x = +x;
-    y = +y;
-    z = +z;
-    var xy = 0.0;
-    var s2 = 0.0;
-    var zz = 0.0;
-    var xs = 0.0;
-    var ys = 0.0;
-    var zs = 0.0;
-    // Combine rotation with skew transform.
-    xy = x + y;
-    s2 = xy * 0.211324865405187;
-    zz = z * 0.288675134594813;
-    xs = s2 - x + zz;
-    ys = s2 - y + zz;
-    zs = xy * 0.577350269189626 + zz;
+  // function eval3DXYBeforeZ(x, y, z) {
+  //   x = +x;
+  //   y = +y;
+  //   z = +z;
+  //   var xy = 0.0;
+  //   var s2 = 0.0;
+  //   var zz = 0.0;
+  //   var xs = 0.0;
+  //   var ys = 0.0;
+  //   var zs = 0.0;
+  //   // Combine rotation with skew transform.
+  //   xy = x + y;
+  //   s2 = xy * 0.211324865405187;
+  //   zz = z * 0.288675134594813;
+  //   xs = s2 - x + zz;
+  //   ys = s2 - y + zz;
+  //   zs = xy * 0.577350269189626 + zz;
 
-    return +eval3DBase(xs, ys, zs);
+  //   return +eval3DBase(xs, ys, zs);
+  // }
+
+  // function eval3DXZBeforeY(x, y, z) {
+  //   x = +x;
+  //   y = +y;
+  //   z = +z;
+  //   var xz = 0.0;
+  //   var s2 = 0.0;
+  //   var yy = 0.0;
+  //   var xs = 0.0;
+  //   var ys = 0.0;
+  //   var zs = 0.0;
+  //   // Combine rotation with skew transform.
+  //   xz = x + z;
+  //   s2 = xz * 0.211324865405187;
+  //   yy = y * 0.288675134594813;
+  //   xs = s2 - x + yy;
+  //   zs = s2 - z + yy;
+  //   ys = xz * 0.577350269189626 + yy;
+
+  //   return +eval3DBase(xs, ys, zs);
+  // }
+
+  function grad3D(xsb, ysb, zsb, dx, dy, dz) {
+    xsb = xsb | 0;
+    ysb = ysb | 0;
+    zsb = zsb | 0;
+    dx = +dx;
+    dy = +dy;
+    dz = +dz;
+    var i = 0;
+    i = (getPerm(xsb & pMask) | 0) ^ (ysb & pMask);
+    i = (getPerm(i) | 0) ^ (zsb & pMask);
+    i = getPerm(i) | 0;
+    i = imul(i, 3);
+    return (
+      +heapF64[(gradients3D + (i << 3) + X) >> 3] * dx +
+      +heapF64[(gradients3D + (i << 3) + Y) >> 3] * dy +
+      +heapF64[(gradients3D + (i << 3) + Z) >> 3] * dz
+    );
   }
 
-  // Similar to the above, except the Y coordinate should always be the "different" coordinate in your use case.
-  function eval3DXZBeforeY(x, y, z) {
-    x = +x;
-    y = +y;
-    z = +z;
-    var xz = 0.0;
-    var s2 = 0.0;
-    var yy = 0.0;
-    var xs = 0.0;
-    var ys = 0.0;
-    var zs = 0.0;
-    // Combine rotation with skew transform.
-    xz = x + z;
-    s2 = xz * 0.211324865405187;
-    yy = y * 0.288675134594813;
-    xs = s2 - x + yy;
-    zs = s2 - z + yy;
-    ys = xz * 0.577350269189626 + yy;
-
-    return +eval3DBase(xs, ys, zs);
-  }
-
-  // 3D OpenSimplex Noise (base which takes skewed coordinates directly).
   function eval3DBase(xs, ys, zs) {
     xs = +xs;
     ys = +ys;
@@ -911,26 +958,34 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
     return +normalize(value);
   }
 
-  function grad4D(xsb, ysb, zsb, wsb, dx, dy, dz, dw) {
-    xsb = xsb | 0;
-    ysb = ysb | 0;
-    zsb = zsb | 0;
-    wsb = wsb | 0;
-    dx = +dx;
-    dy = +dy;
-    dz = +dz;
-    dw = +dw;
+  function noise4D(octaves, lacunarity, persistence, xOffset, yOffset, zOffset, wOffset, x, y, z, w) {
+    octaves = octaves | 0;
+    lacunarity = +lacunarity;
+    persistence = +persistence;
+    xOffset = +xOffset;
+    yOffset = +yOffset;
+    zOffset = +zOffset;
+    wOffset = +wOffset;
+    x = +x;
+    y = +y;
+    z = +z;
+    w = +w;
+    var total = 0.0;
+    var frequency = 1.0;
+    var amplitude = 1.0;
+    var max = 0.0;
     var i = 0;
-    i = (getPerm(xsb & pMask) | 0) ^ (ysb & pMask);
-    i = (getPerm(i) | 0) ^ (zsb & pMask);
-    i = (getPerm(i) | 0) ^ (wsb & pMask);
-    i = getPerm(i) | 0;
-    return (
-      +heapF64[(gradients4D + (i << 5) + X) >> 3] * dx +
-      +heapF64[(gradients4D + (i << 5) + Y) >> 3] * dy +
-      +heapF64[(gradients4D + (i << 5) + Z) >> 3] * dz +
-      +heapF64[(gradients4D + (i << 5) + W) >> 3] * dw
-    );
+    for (i = 0; (i | 0) < (octaves | 0); i = (i + 1) | 0) {
+      total = total + +eval4D(x * frequency, y * frequency, z * frequency, w * frequency) * amplitude;
+      max = max + amplitude;
+      frequency = frequency * lacunarity;
+      amplitude = amplitude * persistence;
+      x = x + xOffset;
+      y = y + yOffset;
+      z = z + yOffset;
+      w = w + yOffset;
+    }
+    return total / max;
   }
 
   function eval4D(x, y, z, w) {
@@ -954,75 +1009,96 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
     return +eval4DBase(xs, ys, zs, ws);
   }
 
-  function eval4DXYBeforeZW(x, y, z, w) {
-    x = +x;
-    y = +y;
-    z = +z;
-    w = +w;
-    var s2 = 0.0;
-    var t2 = 0.0;
-    var xs = 0.0;
-    var ys = 0.0;
-    var zs = 0.0;
-    var ws = 0.0;
+  // function eval4DXYBeforeZW(x, y, z, w) {
+  //   x = +x;
+  //   y = +y;
+  //   z = +z;
+  //   w = +w;
+  //   var s2 = 0.0;
+  //   var t2 = 0.0;
+  //   var xs = 0.0;
+  //   var ys = 0.0;
+  //   var zs = 0.0;
+  //   var ws = 0.0;
 
-    s2 = (x + y) * -0.178275657951399372 + (z + w) * 0.215623393288842828;
-    t2 = (z + w) * -0.403949762580207112 + (x + y) * -0.375199083010075342;
-    xs = x + s2;
-    ys = y + s2;
-    zs = z + t2;
-    ws = w + t2;
+  //   s2 = (x + y) * -0.178275657951399372 + (z + w) * 0.215623393288842828;
+  //   t2 = (z + w) * -0.403949762580207112 + (x + y) * -0.375199083010075342;
+  //   xs = x + s2;
+  //   ys = y + s2;
+  //   zs = z + t2;
+  //   ws = w + t2;
 
-    return +eval4DBase(xs, ys, zs, ws);
+  //   return +eval4DBase(xs, ys, zs, ws);
+  // }
+
+  // function eval4DXZBeforeYW(x, y, z, w) {
+  //   x = +x;
+  //   y = +y;
+  //   z = +z;
+  //   w = +w;
+  //   var s2 = 0.0;
+  //   var t2 = 0.0;
+  //   var xs = 0.0;
+  //   var ys = 0.0;
+  //   var zs = 0.0;
+  //   var ws = 0.0;
+
+  //   s2 = (x + z) * -0.178275657951399372 + (y + w) * 0.215623393288842828;
+  //   t2 = (y + w) * -0.403949762580207112 + (x + z) * -0.375199083010075342;
+  //   xs = x + s2;
+  //   ys = y + t2;
+  //   zs = z + s2;
+  //   ws = w + t2;
+
+  //   return +eval4DBase(xs, ys, zs, ws);
+  // }
+
+  // function eval4DXYZBeforeW(x, y, z, w) {
+  //   x = +x;
+  //   y = +y;
+  //   z = +z;
+  //   w = +w;
+  //   var xyz = 0.0;
+  //   var ww = 0.0;
+  //   var s2 = 0.0;
+  //   var xs = 0.0;
+  //   var ys = 0.0;
+  //   var zs = 0.0;
+  //   var ws = 0.0;
+
+  //   xyz = x + y + z;
+  //   ww = w * 0.2236067977499788;
+  //   s2 = xyz * heapF64[stretchConstant3D >> 3] + ww;
+  //   xs = x + s2;
+  //   ys = y + s2;
+  //   zs = z + s2;
+  //   ws = -0.5 * xyz + ww;
+
+  //   return +eval4DBase(xs, ys, zs, ws);
+  // }
+
+  function grad4D(xsb, ysb, zsb, wsb, dx, dy, dz, dw) {
+    xsb = xsb | 0;
+    ysb = ysb | 0;
+    zsb = zsb | 0;
+    wsb = wsb | 0;
+    dx = +dx;
+    dy = +dy;
+    dz = +dz;
+    dw = +dw;
+    var i = 0;
+    i = (getPerm(xsb & pMask) | 0) ^ (ysb & pMask);
+    i = (getPerm(i) | 0) ^ (zsb & pMask);
+    i = (getPerm(i) | 0) ^ (wsb & pMask);
+    i = getPerm(i) | 0;
+    return (
+      +heapF64[(gradients4D + (i << 5) + X) >> 3] * dx +
+      +heapF64[(gradients4D + (i << 5) + Y) >> 3] * dy +
+      +heapF64[(gradients4D + (i << 5) + Z) >> 3] * dz +
+      +heapF64[(gradients4D + (i << 5) + W) >> 3] * dw
+    );
   }
 
-  function eval4DXZBeforeYW(x, y, z, w) {
-    x = +x;
-    y = +y;
-    z = +z;
-    w = +w;
-    var s2 = 0.0;
-    var t2 = 0.0;
-    var xs = 0.0;
-    var ys = 0.0;
-    var zs = 0.0;
-    var ws = 0.0;
-
-    s2 = (x + z) * -0.178275657951399372 + (y + w) * 0.215623393288842828;
-    t2 = (y + w) * -0.403949762580207112 + (x + z) * -0.375199083010075342;
-    xs = x + s2;
-    ys = y + t2;
-    zs = z + s2;
-    ws = w + t2;
-
-    return +eval4DBase(xs, ys, zs, ws);
-  }
-
-  function eval4DXYZBeforeW(x, y, z, w) {
-    x = +x;
-    y = +y;
-    z = +z;
-    w = +w;
-    var xyz = 0.0;
-    var ww = 0.0;
-    var s2 = 0.0;
-    var xs = 0.0;
-    var ys = 0.0;
-    var zs = 0.0;
-    var ws = 0.0;
-
-    xyz = x + y + z;
-    ww = w * 0.2236067977499788;
-    s2 = xyz * heapF64[stretchConstant3D >> 3] + ww;
-    xs = x + s2;
-    ys = y + s2;
-    zs = z + s2;
-    ws = -0.5 * xyz + ww;
-
-    return +eval4DBase(xs, ys, zs, ws);
-  }
-
-  // 4D OpenSimplex Noise.
   function eval4DBase(xs, ys, zs, ws) {
     xs = +xs;
     ys = +ys;
@@ -2503,14 +2579,9 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
 
   return {
     setSeed: setSeed,
-    eval2D: eval2D,
-    eval3D: eval3D,
-    eval3DXYBeforeZ: eval3DXYBeforeZ,
-    eval3DXZBeforeY: eval3DXZBeforeY,
-    eval4D: eval4D,
-    eval4DXYBeforeZW: eval4DXYBeforeZW,
-    eval4DXZBeforeYW: eval4DXZBeforeYW,
-    eval4DXYZBeforeW: eval4DXYZBeforeW,
+    noise2D: noise2D,
+    noise3D: noise3D,
+    noise4D: noise4D,
   };
 }
 
@@ -2797,17 +2868,7 @@ const heap = new ArrayBuffer(0x100000);
   }
 }
 
-const {
-  setSeed,
-  eval2D,
-  eval3D,
-  eval3DXYBeforeZ,
-  eval3DXZBeforeY,
-  eval4D,
-  eval4DXYBeforeZW,
-  eval4DXZBeforeYW,
-  eval4DXYZBeforeW,
-} = OpenSimplexUnoptimized(
+const { setSeed, noise2D, noise3D, noise4D } = OpenSimplexUnoptimized(
   {
     Math,
     Uint16Array,
@@ -2831,7 +2892,7 @@ export default {
   get seed() {
     return seed;
   },
-  eval2D,
-  eval3D,
-  eval4D,
+  noise2D,
+  noise3D,
+  noise4D,
 };
