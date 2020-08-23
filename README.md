@@ -20,7 +20,7 @@ npm install asm-noise
 ```
 
 ```html
-<script src="https://unpkg.com/browse/asm-noise@latest/"></script>
+<script src="https://unpkg.com/asm-noise"></script>
 ```
 
 ## [Usage](#usage)
