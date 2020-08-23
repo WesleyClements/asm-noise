@@ -1,2 +1,3 @@
-# fast-noise
-An implementation of noise in Web Assembly
+# asm-noise
+
+An implementation of noise algorithms in asm.js.
