@@ -1,7 +1,7 @@
 import perlin from './perlin.js';
 import openSimplexUnoptimized from './openSimplexUnoptimized.js';
 
-export let noise;
+let noise;
 
 {
   const algorithms = new Map([
@@ -64,7 +64,7 @@ export let noise;
       default:
         return algorithms
           .get(algorithm)
-          .noise3D(octaves, lacunarity, persistence, offset.x, offset.y, offset.z, offset.w, x, y, z, w);
+          .noise4D(octaves, lacunarity, persistence, offset.x, offset.y, offset.z, offset.w, x, y, z, w);
     }
   };
 
