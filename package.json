@@ -18,15 +18,17 @@
   "keywords": [
     "fast",
     "noise",
+    "perlin",
+    "OpenSimplex",
     "function",
     "asm-noise",
     "procedural",
     "generation",
     "generator",
     "generate",
-    "2d",
-    "3d",
-    "4d"
+    "2D",
+    "3D",
+    "4D"
   ],
   "author": "Wesley Clements <wesley.clements@gmail.com>",
   "license": "MIT",
