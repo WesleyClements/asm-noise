@@ -115,16 +115,19 @@ var value4D = noise(0.1, 0.2, 0.3, 0.4);
 ## [Contributing](#contributing)
 Pull requests are welcome.
 
-When implementing a new noise generation algorithm, the default export of your ES Module should be an object with following properties:
-- ```javascript
-  seed: number
-  ```
-- ```javascript
-  noise2D: function(octaves, lacunarity, persistence, xOffset, yOffset, x, y) => number
-  ```
-- ```javascript
-  noise3D: function(octaves, lacunarity, persistence, xOffset, yOffset, zOffset, x, y, z) => number
-  ```
-- ```javascript
-  noise4D: function(octaves, lacunarity, persistence, xOffset, yOffset, zOffset, wOffset, x, y, z, w) => number
-  ```
+To implement a new noise generation algorithm:
+1. Create a file in the `src` directory with the name of the algorithm.
+1. This file should be an ES Module.
+1. The deafult export of this file should be an object with following properties:
+  - ```javascript
+    seed: number
+    ```
+  - ```javascript
+    noise2D: function(octaves, lacunarity, persistence, xOffset, yOffset, x, y) => number
+    ```
+  - ```javascript
+    noise3D: function(octaves, lacunarity, persistence, xOffset, yOffset, zOffset, x, y, z) => number
+    ```
+  - ```javascript
+    noise4D: function(octaves, lacunarity, persistence, xOffset, yOffset, zOffset, wOffset, x, y, z, w) => number
+    ```
