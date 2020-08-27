@@ -12,7 +12,7 @@ let noise;
   let algorithm = 'open-simplex';
   let octaves = 8;
   let lacunarity = (1 + Math.sqrt(5)) / 2;
-  let persistence = (1 - Math.sqrt(5)) / 2;
+  let persistence = Math.abs(1 - Math.sqrt(5)) / 2;
 
   let offset;
   {
