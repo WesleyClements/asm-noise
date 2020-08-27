@@ -4,12 +4,6 @@
 
 An implementation of noise algorithms in asm.js.
 
-# asm-noise
-
-[![npm version](https://badge.fury.io/js/asm-noise.svg)](https://badge.fury.io/js/asm-noise)
-
-An implementation of noise algorithms in asm.js.
-
 ## Table of Contents
 
 1.  [Installation](#installation)
