@@ -5,7 +5,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, '../dist'),
     filename: 'asm-noise.js',
-    library: 'asmNoise',
+    library: 'noise',
     libraryExport: 'default',
     libraryTarget: 'umd',
     globalObject: 'this',
