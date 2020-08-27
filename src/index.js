@@ -110,6 +110,13 @@ let noise;
     },
     offset: {
       get: () => offset,
+      set: (value) => {
+        if (typeof value != 'object') throw TypeError('offset must be a number');
+        if (value.x != null) offset.x = value.x;
+        if (value.y != null) offset.y = value.y;
+        if (value.z != null) offset.z = value.z;
+        if (value.w != null) offset.w = value.w;
+      },
     },
   });
 }
