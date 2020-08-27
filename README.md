@@ -4,17 +4,15 @@
 
 An implementation of noise algorithms in asm.js.
 
-# asm-noise
-
-[![npm version](https://badge.fury.io/js/asm-noise.svg)](https://badge.fury.io/js/asm-noise)
-
-An implementation of noise algorithms in asm.js.
-
 ## Table of Contents
 
-1.  [Installation](#installation)
-1.  [Usage](#usage)
-1.  [Options](#options)
+1. [Installation](#installation)
+1. [Usage](#usage)
+1. [Options](#options)
+1. [Roadmap](#roadmap)
+1. [Contributing](#contributing)
+1. [Acknowledgments](#acknowledgments)
+1. [License](#license)
 
 ## Goal and Philosophy
 
@@ -116,3 +114,38 @@ var value4D = noise(0.1, 0.2, 0.3, 0.4);
     w: 9241 * (1 + Math.sqrt(5)) / 2,
   }
   ```
+  
+## [Roadmap](#roadmap)
+
+Todo:
+- Improve performance of algorithms
+- Implement additional algorithms
+- Add batch generation
+
+## [Contributing](#contributing)
+Pull requests are welcome.
+
+To implement a new noise generation algorithm:
+1. Create a file in the `src` directory with the name of the algorithm.
+1. This file should be an ES Module.
+1. The deafult export of this file should be an object with following properties:
+  - ```javascript
+    seed: number
+    ```
+  - ```javascript
+    noise2D: function(octaves, lacunarity, persistence, xOffset, yOffset, x, y) => number
+    ```
+  - ```javascript
+    noise3D: function(octaves, lacunarity, persistence, xOffset, yOffset, zOffset, x, y, z) => number
+    ```
+  - ```javascript
+    noise4D: function(octaves, lacunarity, persistence, xOffset, yOffset, zOffset, wOffset, x, y, z, w) => number
+    ```
+
+## [Acknowledgments](#acknowledgments)
+
+Many thanks to [@KdotJPG](https://github.com/KdotJPG) for the creation of OpenSimplex noise algorithm.
+
+## [License](#license)
+
+This project is licensed under the terms of the MIT license.
