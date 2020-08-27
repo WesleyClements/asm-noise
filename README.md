@@ -6,9 +6,10 @@ An implementation of noise algorithms in asm.js.
 
 ## Table of Contents
 
-1.  [Installation](#installation)
-1.  [Usage](#usage)
-1.  [Options](#options)
+1. [Installation](#installation)
+1. [Usage](#usage)
+1. [Options](#options)
+1. [Contributing](#contributing)
 
 ## Goal and Philosophy
 
@@ -109,4 +110,21 @@ var value4D = noise(0.1, 0.2, 0.3, 0.4);
     z: 10093 * (1 + Math.sqrt(5)) / 2,
     w: 9241 * (1 + Math.sqrt(5)) / 2,
   }
+  ```
+
+## [Contributing](#contributing)
+Pull requests are welcome.
+
+When implementing a new noise generation algorithm, the default export of your ES Module should be an object with following properties:
+- ```javascript
+  seed: number
+  ```
+- ```javascript
+  noise2D: function(octaves, lacunarity, persistence, xOffset, yOffset, x, y) => number
+  ```
+- ```javascript
+  noise3D: function(octaves, lacunarity, persistence, xOffset, yOffset, zOffset, x, y, z) => number
+  ```
+- ```javascript
+  noise4D: function(octaves, lacunarity, persistence, xOffset, yOffset, zOffset, wOffset, x, y, z, w) => number
   ```
