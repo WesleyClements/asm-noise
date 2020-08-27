@@ -4,6 +4,12 @@
 
 An implementation of noise algorithms in asm.js.
 
+# asm-noise
+
+[![npm version](https://badge.fury.io/js/asm-noise.svg)](https://badge.fury.io/js/asm-noise)
+
+An implementation of noise algorithms in asm.js.
+
 ## Table of Contents
 
 1.  [Installation](#installation)
@@ -52,31 +58,61 @@ var value4D = noise(0.1, 0.2, 0.3, 0.4);
 
 ## [Options](#options)
 
-| Property                 | Description                                                                      | Default        |
-| ------------------------ | -------------------------------------------------------------------------------- | -------------- |
-| **algorithm** (_String_) | Noise generation algorithm to be used. Possible values: `open-simplex`, `perlin` | `open-simplex` |
-| **seed** (_Number_)      | Value used to seed the internal state of the current noise generation algorithm. | `Date.now()`   |
+- ### algorithm: (_String_)
 
-- **algorithm**: (_String_) Noise generation algorithm to be used. Possible values: `open-simplex`, `perlin` Default: `open-simplex`
-- **seed**: (_Number_) Value used to seed the internal state of the current noise generation algorithm. Default: `Date.now()`
+  Noise generation algorithm to be used.
+  Possible values: `open-simplex`, `perlin`
 
-```javascript
-// set algorithm out of ['perlin', 'open-simplex']
-asmNoise.algorithm = 'open-simplex';
+  Default:
+  ```javascript
+  noise.algorithm = 'open-simplex';
+  ```
 
-// set seed
-asmNoise.seed = Date.now();
+- ### seed: (_Number_)
 
-// set octaves
-asmNoise.octaves = 8;
-// set lacunarity
-asmNoise.lacunarity = (1 + Math.sqrt(5)) / 2;
-// set persistence
-asmNoise.persistence = (1 - Math.sqrt(5)) / 2;
+  Value used to seed the internal state of the current noise generation algorithm.
 
-// set offset
-asmNoise.offset.x = 0.1;
-asmNoise.offset.y = 0.2;
-asmNoise.offset.z = 0.3;
-asmNoise.offset.w = 0.4;
-```
+  Default:
+  ```javascript
+  noise.seed = Date.now();
+  ```
+
+- ### octaves: (_Number_)
+
+  Number of itterations of noise to sum together when generating noise at single point.
+
+  Default:
+  ```javascript
+  noise.octaves = 8;
+  ```
+
+- ### lacunarity: (_Number_)
+
+  On the nth generation itteration, the generation point is scaled by this value raised to the nth power.
+
+  Default:
+  ```javascript
+  noise.lacunarity = (1 + Math.sqrt(5)) / 2;
+  ```
+
+- ### persistence: (_Number_)
+
+  On the nth generation itteration, the nth noise value is scaled by this value raised to the nth power.
+
+  Default:
+  ```javascript
+  noise.lacunarity = Math.abs(1 - Math.sqrt(5)) / 2;
+  ```
+- ### offset: (_Object_)
+
+  Contains the `x`, `y`, `z`, `w` values to add to the generation point between generation itterations.
+
+  Default: 
+  ```javascript
+  noise.offset = {
+    x: 5393 * (1 + Math.sqrt(5)) / 2,
+    y: 4691 * (1 + Math.sqrt(5)) / 2,
+    z: 10093 * (1 + Math.sqrt(5)) / 2,
+    w: 9241 * (1 + Math.sqrt(5)) / 2,
+  }
+  ```
