@@ -144,37 +144,3 @@ export default Object.defineProperty(
     },
   }
 );
-
-let offset;
-{
-  offset = {
-    get x() {
-      return offsetX;
-    },
-    set x(value) {
-      if (typeof value !== 'number') throw TypeError('must be a number');
-      offsetX = value;
-    },
-    get y() {
-      return offsetY;
-    },
-    set y(value) {
-      if (typeof value !== 'number') throw TypeError('must be a number');
-      offsetY = value;
-    },
-    get z() {
-      return offsetZ;
-    },
-    set z(value) {
-      if (typeof value !== 'number') throw TypeError('must be a number');
-      offsetZ = value;
-    },
-    get w() {
-      return offsetW;
-    },
-    set w(value) {
-      if (typeof value !== 'number') throw TypeError('must be a number');
-      offsetW = value;
-    },
-  };
-}
