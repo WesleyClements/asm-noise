@@ -85,18 +85,12 @@ export default Object.defineProperty(
       value(options) {
         if (options == null) return;
         const { seed, algorithm, octaves, lacunarity, persistence, offset } = options;
-        if (seed != null) {
-        }
-        if (algorithm != null) {
-        }
-        if (octaves != null) {
-        }
-        if (lacunarity != null) {
-        }
-        if (persistence != null) {
-        }
-        if (offset != null) {
-        }
+        if (algorithm != null) this.algorithm = algorithm;
+        if (seed != null) this.seed = seed;
+        if (octaves != null) this.octaves = octaves;
+        if (lacunarity != null) this.lacunarity = lacunarity;
+        if (persistence != null) this.persistence = persistence;
+        if (offset != null) this.offset = offset;
       },
     },
     algorithm: {
