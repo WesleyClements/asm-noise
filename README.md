@@ -56,75 +56,85 @@ var value4D = noise(0.1, 0.2, 0.3, 0.4);
 
 ## [Options](#options)
 
-- **algorithm**: (_String_)
+Noise generation options can be set directly or by passing an options object into `noise.config`
 
-  Noise generation algorithm to be used.
-  Possible values: `open-simplex`, `perlin`
+```javascript
+noise.config({ ...options... });
 
-  Default:
+noise.algorithm = 'open-simplex';
+noise.seed = Date.now();
+noise.octaves = 8;
+noise.lacunarity = (1 + Math.sqrt(5)) / 2;
+noise.persistence = (Math.sqrt(5) - 1) / 2;
+noise.offset = {
+  x: (5393 * (1 + Math.sqrt(5))) / 2,
+  y: (4691 * (1 + Math.sqrt(5))) / 2,
+  z: (10093 * (1 + Math.sqrt(5))) / 2,
+  w: (9241 * (1 + Math.sqrt(5))) / 2,
+};
+```
 
-  ```javascript
-  noise.algorithm = 'open-simplex';
-  ```
+### `algorithm`
 
-- **seed**: (_Number_)
+Type: `String`
 
-  Value used to seed the internal state of the current noise generation algorithm.
+Noise generation algorithm to be used.
+Possible values: `open-simplex`, `perlin`
 
-  Default:
+Default: `'open-simplex'`
 
-  ```javascript
-  noise.seed = Date.now();
-  ```
+### `seed`
 
-- **octaves**: (_Number_)
+Type: `Number`
 
-  Number of itterations of noise to sum together when generating noise at single point.
+Default: `'open-simplex'`
 
-  Default:
+Value used to seed the internal state of the current noise generation algorithm.
 
-  ```javascript
-  noise.octaves = 8;
-  ```
+Default: `Date.now()`
 
-- **lacunarity**: (_Number_)
+### `octaves`
 
-  On the nth generation itteration, the generation point is scaled by this value raised to the nth power.
+Type: `Number`
 
-  Default:
+Number of itterations of noise to sum together when generating noise at single point.
 
-  ```javascript
-  noise.lacunarity = (1 + Math.sqrt(5)) / 2;
-  ```
+Default: `8`
 
-- **persistence**: (_Number_)
+### `lacunarity`
 
-  On the nth generation itteration, the nth noise value is scaled by this value raised to the nth power.
+Type: `Number`
 
-  Default:
+On the nth generation itteration, the generation point is scaled by this value raised to the nth power.
 
-  ```javascript
-  noise.lacunarity = Math.abs(1 - Math.sqrt(5)) / 2;
-  ```
+Default: `(1 + Math.sqrt(5)) / 2`
 
-- **offset**: (_Object_)
+### `persistence`
 
-  Contains the `x`, `y`, `z`, `w` values to add to the generation point between generation itterations.
+Type: `Number`
 
-  Default:
+On the nth generation itteration, the nth noise value is scaled by this value raised to the nth power.
 
-  ```javascript
-  noise.offset = {
-    x: (5393 * (1 + Math.sqrt(5))) / 2,
-    y: (4691 * (1 + Math.sqrt(5))) / 2,
-    z: (10093 * (1 + Math.sqrt(5))) / 2,
-    w: (9241 * (1 + Math.sqrt(5))) / 2,
-  };
-  ```
+Default: `(Math.sqrt(5) - 1) / 2`
+
+### `offset`
+
+Type: `{ x: Number; y: Number; z: Number; w: Number; }`
+
+Contains axis specific values to add to the generation point between generation itterations.
+
+Default:
+
+```javascript
+{
+  x: (5393 * (1 + Math.sqrt(5))) / 2,
+  y: (4691 * (1 + Math.sqrt(5))) / 2,
+  z: (10093 * (1 + Math.sqrt(5))) / 2,
+  w: (9241 * (1 + Math.sqrt(5))) / 2,
+  }
+```
 
 ## [Roadmap](#roadmap)
-
-Todo:
 
 - Improve performance of algorithms
 - Implement additional algorithms
