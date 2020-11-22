@@ -22,35 +22,35 @@ const offset = Object.defineProperties(
     x: {
       get: () => offsetX,
       set(value) {
-        if (typeof value !== 'number') throw TypeError('must be a number');
+        if (typeof value !== 'number') throw TypeError('offset.x must be a number');
         offsetX = value;
       },
     },
     y: {
       get: () => offsetY,
       set(value) {
-        if (typeof value !== 'number') throw TypeError('must be a number');
+        if (typeof value !== 'number') throw TypeError('offset.y must be a number');
         offsetY = value;
       },
     },
     z: {
       get: () => offsetZ,
-      set z(value) {
-        if (typeof value !== 'number') throw TypeError('must be a number');
+      set(value) {
+        if (typeof value !== 'number') throw TypeError('offset.z must be a number');
         offsetZ = value;
       },
     },
     w: {
       get: () => offsetW,
-      set w(value) {
-        if (typeof value !== 'number') throw TypeError('must be a number');
+      set(value) {
+        if (typeof value !== 'number') throw TypeError('offset.w must be a number');
         offsetW = value;
       },
     },
   }
 );
 
-export default Object.defineProperty(
+const noise = Object.defineProperties(
   function noise(x, y, z, w) {
     if (arguments.length < 2) return;
     switch (arguments.length) {
@@ -126,7 +126,7 @@ export default Object.defineProperty(
     },
     persistence: {
       get: () => persistence,
-      set: (value) => {
+      set(value) {
         if (typeof value !== 'number') throw TypeError('persistence must be a number');
         if (value === 0) throw RangeError('persistence must not be 0');
         persistence = value;
@@ -144,3 +144,4 @@ export default Object.defineProperty(
     },
   }
 );
+export default noise;
