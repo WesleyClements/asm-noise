@@ -56,11 +56,9 @@ var value4D = noise(0.1, 0.2, 0.3, 0.4);
 
 ## [Options](#options)
 
-Noise generation options can be set directly or by passing an options object into `noise.config`
+Noise generation options can be set directly
 
 ```javascript
-noise.config({ ...options... });
-
 noise.algorithm = 'open-simplex';
 noise.seed = Date.now();
 noise.octaves = 8;
@@ -72,6 +70,12 @@ noise.offset = {
   z: (10093 * (1 + Math.sqrt(5))) / 2,
   w: (9241 * (1 + Math.sqrt(5))) / 2,
 };
+```
+
+or by passing an options object to `noise.config`
+
+```javascript
+noise.config({ ...options... });
 ```
 
 ### `algorithm`
