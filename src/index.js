@@ -11,44 +11,21 @@ let octaves = 8;
 let lacunarity = (1 + Math.sqrt(5)) / 2;
 let persistence = Math.abs(1 - Math.sqrt(5)) / 2;
 
-let offsetX = 5393 * lacunarity;
-let offsetY = 4691 * lacunarity;
-let offsetZ = 10093 * lacunarity;
-let offsetW = 9241 * lacunarity;
+const offset = {
+  x: 5393 * lacunarity,
+  y: 4691 * lacunarity,
+  z: 10093 * lacunarity,
+  w: 9241 * lacunarity,
+};
 
-const offset = Object.defineProperties(
-  {},
-  {
-    x: {
-      get: () => offsetX,
-      set(value) {
-        if (typeof value !== 'number') throw TypeError('offset.x must be a number');
-        offsetX = value;
-      },
-    },
-    y: {
-      get: () => offsetY,
-      set(value) {
-        if (typeof value !== 'number') throw TypeError('offset.y must be a number');
-        offsetY = value;
-      },
-    },
-    z: {
-      get: () => offsetZ,
-      set(value) {
-        if (typeof value !== 'number') throw TypeError('offset.z must be a number');
-        offsetZ = value;
-      },
-    },
-    w: {
-      get: () => offsetW,
-      set(value) {
-        if (typeof value !== 'number') throw TypeError('offset.w must be a number');
-        offsetW = value;
-      },
-    },
-  }
-);
+const offsetProxy = new Proxy(offset, {
+  set(obj, prop, value) {
+    if (!/^x|y|z|y$/.test(prop)) Reflect.set(...arguments);
+    if (typeof value !== 'number') throw TypeError(`offset.${prop} must be a number`);
+    if (Number.isNaN(value)) throw RangeError(`offset.${prop} cannot be NaN`);
+    obj[prop.value];
+  },
+});
 
 const noise = Object.defineProperties(
   function noise(x, y, z, w) {
@@ -57,11 +34,21 @@ const noise = Object.defineProperties(
       case 2:
         return algorithms
           .get(algorithm)
-          .noise2D(octaves, lacunarity, persistence, offset.x, offset.y, x, y);
+          .noise2D(octaves, lacunarity, persistence, offsetProxy.x, offsetProxy.y, x, y);
       case 3:
         return algorithms
           .get(algorithm)
-          .noise3D(octaves, lacunarity, persistence, offset.x, offset.y, offset.z, x, y, z);
+          .noise3D(
+            octaves,
+            lacunarity,
+            persistence,
+            offsetProxy.x,
+            offsetProxy.y,
+            offsetProxy.z,
+            x,
+            y,
+            z
+          );
       default:
         return algorithms
           .get(algorithm)
@@ -69,10 +56,10 @@ const noise = Object.defineProperties(
             octaves,
             lacunarity,
             persistence,
-            offset.x,
-            offset.y,
-            offset.z,
-            offset.w,
+            offsetProxy.x,
+            offsetProxy.y,
+            offsetProxy.z,
+            offsetProxy.w,
             x,
             y,
             z,
@@ -112,6 +99,7 @@ const noise = Object.defineProperties(
       get: () => octaves,
       set(value) {
         if (typeof value !== 'number') throw TypeError('octave must be a number');
+        if (Number.isNaN(value)) throw RangeError('octave cannot be NaN');
         if (value < 1) throw RangeError('octave must greater than 0');
         octaves = value;
       },
@@ -128,18 +116,19 @@ const noise = Object.defineProperties(
       get: () => persistence,
       set(value) {
         if (typeof value !== 'number') throw TypeError('persistence must be a number');
+        if (Number.isNaN(value)) throw RangeError('persistence cannot be NaN');
         if (value === 0) throw RangeError('persistence must not be 0');
         persistence = value;
       },
     },
     offset: {
-      get: () => offset,
+      get: () => offsetProxy,
       set(value) {
         if (typeof value != 'object') throw TypeError('offset must be a object');
-        if (value.x != null) offset.x = value.x;
-        if (value.y != null) offset.y = value.y;
-        if (value.z != null) offset.z = value.z;
-        if (value.w != null) offset.w = value.w;
+        offsetProxy.x = value.x ?? 0;
+        offsetProxy.y = value.y ?? 0;
+        offsetProxy.z = value.z ?? 0;
+        offsetProxy.w = value.w ?? 0;
       },
     },
   }
