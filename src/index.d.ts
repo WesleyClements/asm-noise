@@ -1,7 +1,7 @@
 // Type definitions for index.js
 // Project: asm-noise
 // Definitions by: Wesley Clements <https://github.com/WesleyClements>
-declare type ASMNoiseOptions = {
+declare interface ASMNoiseOptions {
   seed?: number;
   algorithm?: 'perlin' | 'open-simplex';
   octaves?: number;
@@ -13,7 +13,7 @@ declare type ASMNoiseOptions = {
     z: number;
     w: number;
   };
-};
+}
 
 declare module 'asm-noise' {
   function noise(x: number, y: number): number;
