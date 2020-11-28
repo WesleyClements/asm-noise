@@ -5,14 +5,29 @@
   <meta name="theme-color" content="#f00">
   <link rel="shortcut icon" href="https://p5js.org/assets/img/favicon.ico" />
   <link rel="icon" href="https://p5js.org/assets/img/favicon.ico" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
   <style>
     * {
       padding: 0px;
       margin: 0px;
     }
 
+    html,
+    body {
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+
     canvas {
       display: block;
+      margin: auto;
+    }
+
+    #ui {
+      position: absolute;
+      top: 0;
+      left: 0;
     }
   </style>
   <title>asm-noise</title>
@@ -22,7 +37,44 @@
   <noscript>
     You need to enable JavaScript to run this app.
   </noscript>
-  <script src="https://unpkg.com/p5@1.1.9/lib/p5.min.js"></script>
+  <main>
+    <div id="ui" class="section box m-5 px-5 py-3">
+      <div class="is-flex">
+        <div class="field">
+          <label class="label">Algorithm</label>
+          <div class="control">
+            <div class="select">
+              <select id="algorithm-select">
+                <option value="open-simplex" selected>OpenSimplex</option>
+                <option value="perlin">Perlin</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Dimensions</label>
+          <div class="control">
+            <div class="select">
+              <select id="dimension-select">
+                <option value="2" selected>2D</option>
+                <option value="3">3D</option>
+                <option value="4">4D</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="">
+        <div class="field">
+          <label class="label">Seed</label>
+          <div class="control">
+            <input type="text" class="input" name="seed">
+          </div>
+        </div>
+      </div>
+    </div>
+    <canvas id="noise-canvas" />
+  </main>
   <script src="https://unpkg.com/asm-noise@1.0.2/dist/asm-noise.js"></script>
   <script src="index.js"></script>
 </body>
