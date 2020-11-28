@@ -34,21 +34,11 @@ const noise = Object.defineProperties(
       case 2:
         return algorithms
           .get(algorithm)
-          .noise2D(octaves, lacunarity, persistence, offsetProxy.x, offsetProxy.y, x, y);
+          .noise2D(octaves, lacunarity, persistence, offset.x, offset.y, x, y);
       case 3:
         return algorithms
           .get(algorithm)
-          .noise3D(
-            octaves,
-            lacunarity,
-            persistence,
-            offsetProxy.x,
-            offsetProxy.y,
-            offsetProxy.z,
-            x,
-            y,
-            z
-          );
+          .noise3D(octaves, lacunarity, persistence, offset.x, offset.y, offset.z, x, y, z);
       default:
         return algorithms
           .get(algorithm)
@@ -56,10 +46,10 @@ const noise = Object.defineProperties(
             octaves,
             lacunarity,
             persistence,
-            offsetProxy.x,
-            offsetProxy.y,
-            offsetProxy.z,
-            offsetProxy.w,
+            offset.x,
+            offset.y,
+            offset.z,
+            offset.w,
             x,
             y,
             z,
