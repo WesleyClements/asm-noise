@@ -18,6 +18,7 @@
       overflow: hidden;
       width: 100vw;
       height: 100vh;
+      background-color: whitesmoke;
     }
 
     canvas {
@@ -29,6 +30,18 @@
       position: absolute;
       top: 0;
       left: 0;
+    }
+
+    @media screen and (max-width: 769px) {
+
+      html,
+      body {
+        overflow: auto;
+      }
+
+      #ui {
+        position: relative;
+      }
     }
   </style>
   <title>asm-noise</title>
@@ -89,9 +102,9 @@
         </div>
       </div>
       <hr />
-      <button class="button is-fullwidth">Generate</button>
+      <button class="button is-fullwidth mb-2">Generate</button>
     </div>
-    <canvas id="noise-canvas" />
+    <canvas id="noise-canvas" style="display: none;"></canvas>
   </main>
   <script src="https://unpkg.com/asm-noise@1.0.2/dist/asm-noise.js"></script>
   <script src="index.js"></script>
