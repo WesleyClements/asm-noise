@@ -6,6 +6,7 @@
   <link rel="shortcut icon" href="https://p5js.org/assets/img/favicon.ico" />
   <link rel="icon" href="https://p5js.org/assets/img/favicon.ico" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/bulma-slider@2.0.4/dist/css/bulma-slider.min.css">
   <style>
     * {
       padding: 0px;
@@ -39,37 +40,55 @@
   </noscript>
   <main>
     <div id="ui" class="section box m-5 px-5 py-3">
-      <div class="is-flex">
-        <div class="field">
-          <label class="label">Algorithm</label>
-          <div class="control">
-            <div class="select">
-              <select id="algorithm-select">
-                <option value="open-simplex" selected>OpenSimplex</option>
-                <option value="perlin">Perlin</option>
-              </select>
+      <div class="field">
+        <label class="label">Algorithm</label>
+        <div class="field-body">
+          <div class="field has-addons">
+            <div class="control">
+              <div class="select">
+                <select id="algorithm-select">
+                  <option value="open-simplex" selected>OpenSimplex</option>
+                  <option value="perlin">Perlin</option>
+                </select>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="field">
-          <label class="label">Dimensions</label>
-          <div class="control">
-            <div class="select">
-              <select id="dimension-select">
-                <option value="2" selected>2D</option>
-                <option value="3">3D</option>
-                <option value="4">4D</option>
-              </select>
+            <div class="control">
+              <div class="select">
+                <select id="dimension-select">
+                  <option value="2" selected>2D</option>
+                  <option value="3">3D</option>
+                  <option value="4">4D</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
       <div class="field">
         <label class="label">Seed</label>
         <div class="control">
-          <input type="text" class="input" name="seed">
+          <input type="text" class="input" name="seed" />
         </div>
       </div>
+      <hr />
+      <div class="field">
+        <label class="label">Scale</label>
+        <div class="field-body">
+          <div class="field is-grouped is-grouped-multiline">
+            <div class="columns">
+              <div class="column control is-one-third">
+                <input type="text" class="input" name="scale" value="0.01" />
+              </div>
+              <div class="column control">
+                <input type="range" class="slider is-fullwidth" name="scale-slider" min="-3" max="2" step="0.1"
+                  value="-2" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr />
       <button class="button is-fullwidth">Generate</button>
     </div>
     <canvas id="noise-canvas" />
