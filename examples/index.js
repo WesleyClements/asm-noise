@@ -14,7 +14,7 @@
   const resolutionInput = ui.querySelector('input[name=resolution]');
   const resolutionSlider = ui.querySelector('input[name=resolution-slider]');
   const generateBtn = ui.querySelector('button');
-
+  const generationMetricsSpan = ui.querySelector('#generation-metrics');
   let renderCount = 0;
 
   seedInput.value = noise.seed;
@@ -27,6 +27,28 @@
 
   const configNoise = () =>
     noise.config({ algorithm: algorithmSelect.value, seed: seedInput.value });
+
+  const generateNoiseValues = ({ scale, resolution, width, height }) => {
+    const values = new Float64Array(width * height);
+    const start = (performance ?? Date).now();
+    for (let i = 0; i < width; ++i) {
+      for (let j = 0; j < height; ++j) {
+        values[i + j * width] = noise((i / resolution) * scale, (j / resolution) * scale);
+      }
+    }
+    const dt = (performance ?? Date).now() - start;
+    return {
+      dt: dt.toLocaleString(undefined, {
+        maximumFractionDigits: 2,
+      }),
+      values,
+      getValue: (i, j) => {
+        const x = Math.floor(i * resolution);
+        const y = Math.floor(j * resolution);
+        return values[x + y * width];
+      },
+    };
+  };
 
   const renderNoise = (() => {
     let renderHandle;
@@ -49,32 +71,20 @@
         new Promise((resolve) => setTimeout(() => resolve(), 0)).then(() => {
           const ctx = canvas.getContext('2d');
 
-          const scale = calculateScale(scaleSlider.value);
           const resolution = resolutionSlider.value / 100;
-
-          const width = Math.floor(canvas.width * resolution) + 1;
-          const height = Math.floor(canvas.height * resolution) + 1;
-
-          const noiseData = new Float64Array(width * height);
-
-          const start = (performance ?? Date).now();
-          for (let i = 0; i < width; ++i) {
-            for (let j = 0; j < height; ++j) {
-              noiseData[i + j * width] = noise((i / resolution) * scale, (j / resolution) * scale);
-            }
-          }
-          const dt = (performance ?? Date).now() - start;
-          console.log(dt);
-          const getNoise = (i, j) => {
-            const x = Math.floor(i * resolution);
-            const y = Math.floor(j * resolution);
-            return noiseData[x + y * width];
+          const generationConfig = {
+            scale: calculateScale(scaleSlider.value),
+            resolution,
+            width: Math.floor(canvas.width * resolution) + 1,
+            height: Math.floor(canvas.height * resolution) + 1,
           };
+          const { dt, values, getValue } = generateNoiseValues(generationConfig);
+
           const imgData = ctx.createImageData(canvas.width, canvas.height);
           for (let i = 0; i < imgData.width; ++i) {
             for (let j = 0; j < imgData.height; ++j) {
               const index = (i + j * imgData.width) * 4;
-              const value = 255 * getNoise(i, j);
+              const value = 255 * getValue(i, j);
               imgData.data[index + 0] = value;
               imgData.data[index + 1] = value;
               imgData.data[index + 2] = value;
@@ -91,12 +101,9 @@
 
           generateBtn.classList.remove('is-loading', 'disabled');
           canvas.removeAttribute('style');
+          generationMetricsSpan.removeAttribute('style');
 
-          ui.querySelector('#generation-metrics').textContent = `Generated ${
-            width * height
-          } noise values in ${dt.toLocaleString(undefined, {
-            maximumFractionDigits: 2,
-          })}ms`;
+          generationMetricsSpan.textContent = `Generated ${values.length} noise values in ${dt}ms`;
 
           if (!ui.querySelector('output#time')) rendering = false;
           renderCount++;
