@@ -123,4 +123,25 @@ const noise = Object.defineProperties(
     },
   }
 );
+
+new Promise((resolve) => setTimeout(() => resolve(), 0)).then(
+  [...algorithms.values()].forEach((algorithm) => {
+    algorithm.noise2D(octaves, lacunarity, persistence, offset.x, offset.y, 0, 0);
+    algorithm.noise3D(octaves, lacunarity, persistence, offset.x, offset.y, offset.z, 0, 0, 0);
+    algorithm.noise4D(
+      octaves,
+      lacunarity,
+      persistence,
+      offset.x,
+      offset.y,
+      offset.z,
+      offset.w,
+      0,
+      0,
+      0,
+      0
+    );
+  })
+);
+
 export default noise;

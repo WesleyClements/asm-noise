@@ -48,8 +48,8 @@ function nextBool() {
 export default {
   set seed(value) {
     if (typeof value !== 'bigint') value = BigInt(value);
-    heap[seed] = value;
     heap[current] = value;
+    heap[seed] = nextBigInt64();
   },
   get seed() {
     return heap[seed];
