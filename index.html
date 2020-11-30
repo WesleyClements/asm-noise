@@ -1,0 +1,170 @@
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <meta name="theme-color" content="#f00">
+  <link rel="shortcut icon" href="https://p5js.org/assets/img/favicon.ico" />
+  <link rel="icon" href="https://p5js.org/assets/img/favicon.ico" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/bulma-slider@2.0.4/dist/css/bulma-slider.min.css">
+  <style>
+    * {
+      padding: 0px;
+      margin: 0px;
+    }
+
+    html,
+    body {
+      overflow: hidden;
+      scrollbar-width: none;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    main {
+      display: flex;
+      align-items: center;
+    }
+
+    canvas {
+      display: block;
+      margin: auto;
+    }
+
+    #ui {
+      position: absolute;
+    }
+
+    #ui-handle {
+      cursor: move;
+    }
+
+    #ui-toggle {
+      cursor: pointer;
+    }
+
+    @media screen and (max-width: 769px) {
+
+      html,
+      body {
+        overflow: auto;
+      }
+
+      main {
+        display: inline;
+      }
+
+      #ui {
+        position: static;
+      }
+
+      #ui-handle {
+        display: none;
+      }
+    }
+  </style>
+  <script src="https://kit.fontawesome.com/843d7dd4d0.js" crossorigin="anonymous"></script>
+  <title>asm-noise</title>
+</head>
+
+<body>
+  <noscript>
+    You need to enable JavaScript to run this app.
+  </noscript>
+  <main>
+    <div id="ui" class="section box m-5 px-3 pt-3 pb-0" style="top:0;left:0;">
+      <div class="is-flex is-justify-content-space-between">
+        <div>
+          <span id="ui-handle" class="icon">
+            <i class="fas fa-bars"></i>
+          </span>
+        </div>
+        <span id="ui-toggle" class="icon">
+          <i class="fas fa-minus"></i>
+        </span>
+      </div>
+      <div id="ui-content" class="m-3">
+        <div class="field">
+          <label class="label">Algorithm</label>
+          <div class="field-body">
+            <div class="field has-addons">
+              <div class="control">
+                <div class="select">
+                  <select id="algorithm-select">
+                    <option value="open-simplex" selected>OpenSimplex</option>
+                    <option value="perlin">Perlin</option>
+                  </select>
+                </div>
+              </div>
+              <div class="control">
+                <div class="select">
+                  <select id="dimension-select">
+                    <option value="2" selected>2D</option>
+                    <option value="3">3D</option>
+                    <option value="4">4D</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Seed</label>
+          <div class="control">
+            <input type="text" class="input" name="seed" />
+          </div>
+        </div>
+        <hr />
+        <div class="field">
+          <label class="label">Noise Scale</label>
+          <div class="field-body">
+            <div class="field is-grouped is-grouped-multiline">
+              <div class="columns">
+                <div class="column control is-one-third">
+                  <input type="text" class="input" name="scale" value="0.01" />
+                </div>
+                <div class="column control">
+                  <input type="range" class="slider is-fullwidth" name="scale-slider" min="-3" max="2" step="0.1"
+                    value="-2" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Resolution</label>
+          <div class="field-body">
+            <div class="field is-grouped is-grouped-multiline">
+              <div class="columns">
+                <div class="column control is-one-third">
+                  <input type="text" class="input" name="resolution" value="50%" />
+                </div>
+                <div class="column control">
+                  <input type="range" class="slider is-fullwidth" name="resolution-slider" min="10" max="100" step="1"
+                    value="50" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr />
+        <div class="columns">
+          <div class="column pb-0">
+            <button id="generate-btn" class="button p-0 is-fullwidth">Generate</button>
+          </div>
+          <div class="column pb-0">
+            <a id="save-btn" class="button p-0 is-fullwidth" disabled>Save</a>
+          </div>
+        </div>
+        <div class="is-flex is-justify-content-center is-align-content-center">
+          <span id="generation-metrics" class="mb-1" style="display: none;"></span>
+        </div>
+      </div>
+    </div>
+    <canvas id="noise-canvas" style="display: none;"></canvas>
+  </main>
+  <script src="https://unpkg.com/asm-noise@1.0.2/dist/asm-noise.js"></script>
+  <script src="index.js"></script>
+</body>
+
+</html>
