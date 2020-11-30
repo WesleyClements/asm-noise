@@ -1,4 +1,5 @@
 (function () {
+  const noiseWorker = window.Worker ? new Worker('./assets/js/noiseWorker.js') : null;
   const main = document.querySelector('main');
 
   const canvas = main.querySelector('canvas');
@@ -29,24 +30,23 @@
   const configNoise = () =>
     noise.config({ algorithm: algorithmSelect.value, seed: seedInput.value });
 
-  const generateNoiseValues = ({ scale, resolution, width, height }) => {
-    const points = new Array(width * height);
-    for (let i = 0; i < width; ++i) {
-      for (let j = 0; j < height; ++j) {
-        points[i + j * width] = [(i / resolution) * scale, (j / resolution) * scale];
-        if (dimensionSelect.value > 2) points[i + j * width].push((i / resolution) * scale);
-        if (dimensionSelect.value > 3) points[i + j * width].push((j / resolution) * scale);
-      }
-    }
-    const values = new Float64Array(width * height);
-    const start = (performance ?? Date).now();
-    for (let i = 0; i < width; ++i) {
-      for (let j = 0; j < height; ++j) {
-        const index = i + j * width;
-        values[index] = noise(...points[index]);
-      }
-    }
-    const dt = (performance ?? Date).now() - start;
+  const generateNoiseValues = async ({ dimensions, scale, resolution, width, height }) => {
+    const { dt, values } = await (noiseWorker
+      ? new Promise((resolve, reject) => {
+          const onMessage = (e) => {
+            noiseWorker.removeEventListener('message', onMessage);
+            resolve(e.data);
+          };
+          noiseWorker.addEventListener('message', onMessage);
+          noiseWorker.postMessage({ dimensions, scale, resolution, width, height });
+        })
+      : generateNoiseValuesSync({
+          dimensions,
+          scale,
+          resolution,
+          width,
+          height,
+        }));
     return {
       dt: dt.toLocaleString(undefined, {
         maximumFractionDigits: 2,
@@ -82,17 +82,17 @@
         saveBtn.setAttribute('disabled', true);
 
         // wait on a timeout to allow browser to do it's stuff
-        new Promise((resolve) => setTimeout(() => resolve(), 0)).then(() => {
+        new Promise((resolve) => setTimeout(() => resolve(), 0)).then(async () => {
           const ctx = canvas.getContext('2d');
 
           const resolution = resolutionSlider.value / 100;
-          const generationConfig = {
+          const { dt, values, getValue } = await generateNoiseValues({
+            dimensions: dimensionSelect.value,
             scale: calculateScale(scaleSlider.value),
             resolution,
             width: Math.floor(canvas.width * resolution) + 1,
             height: Math.floor(canvas.height * resolution) + 1,
-          };
-          const { dt, values, getValue } = generateNoiseValues(generationConfig);
+          });
 
           const imgData = ctx.createImageData(canvas.width, canvas.height);
           for (let i = 0; i < imgData.width; ++i) {
