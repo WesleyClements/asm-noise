@@ -21,6 +21,8 @@
 
   seedInput.value = noise.seed;
 
+  const wait = (ms = 0) => new Promise((resolve) => setTimeout(() => resolve(), ms));
+
   const updateCanvasDimensions = () => {
     canvas.width = canvas.height = innerWidth > innerHeight ? innerHeight : innerWidth;
   };
@@ -30,8 +32,8 @@
   const configNoise = () =>
     noise.config({ algorithm: algorithmSelect.value, seed: seedInput.value });
 
-  const generateNoiseValues = async ({ dimensions, scale, resolution, width, height }) => {
-    const { dt, values } = await (noiseWorker
+  const generateNoiseImage = async ({ dimensions, scale, resolution, width, height }) => {
+    const { dt, noiseValues, imgData } = await (noiseWorker
       ? new Promise((resolve, reject) => {
           const onMessage = (e) => {
             noiseWorker.removeEventListener('message', onMessage);
@@ -40,7 +42,7 @@
           noiseWorker.addEventListener('message', onMessage);
           noiseWorker.postMessage({ dimensions, scale, resolution, width, height });
         })
-      : generateNoiseValuesSync({
+      : generateNoiseImageSync({
           dimensions,
           scale,
           resolution,
@@ -51,12 +53,8 @@
       dt: dt.toLocaleString(undefined, {
         maximumFractionDigits: 2,
       }),
-      values,
-      getValue: (i, j) => {
-        const x = Math.floor(i * resolution);
-        const y = Math.floor(j * resolution);
-        return values[x + y * width];
-      },
+      noiseValues,
+      imgData,
     };
   };
 
@@ -66,7 +64,7 @@
     return () => {
       if (rendering) return;
       clearTimeout(renderHandle);
-      renderHandle = setTimeout(() => {
+      renderHandle = setTimeout(async () => {
         rendering = true;
 
         generateBtn.classList.add('is-loading', 'disabled');
@@ -82,53 +80,38 @@
         saveBtn.setAttribute('disabled', true);
 
         // wait on a timeout to allow browser to do it's stuff
-        new Promise((resolve) => setTimeout(() => resolve(), 0)).then(async () => {
-          const ctx = canvas.getContext('2d');
+        await wait();
 
-          const resolution = resolutionSlider.value / 100;
-          const { dt, values, getValue } = await generateNoiseValues({
-            dimensions: dimensionSelect.value,
-            scale: calculateScale(scaleSlider.value),
-            resolution,
-            width: Math.floor(canvas.width * resolution) + 1,
-            height: Math.floor(canvas.height * resolution) + 1,
-          });
+        const ctx = canvas.getContext('2d');
 
-          const imgData = ctx.createImageData(canvas.width, canvas.height);
-          for (let i = 0; i < imgData.width; ++i) {
-            for (let j = 0; j < imgData.height; ++j) {
-              const index = (i + j * imgData.width) * 4;
-              const value = 255 * getValue(i, j);
-              imgData.data[index + 0] = value;
-              imgData.data[index + 1] = value;
-              imgData.data[index + 2] = value;
-              imgData.data[index + 3] = 255;
-            }
-          }
-          ctx.putImageData(imgData, 0, 0);
-
-          saveBtn.setAttribute('download', algorithmSelect.value + '-noise');
-          saveBtn.setAttribute('href', canvas.toDataURL('image/png'));
-
-          // re-enble config inputs after rendering
-          algorithmSelect.removeAttribute('disabled');
-          dimensionSelect.removeAttribute('disabled');
-          seedInput.removeAttribute('disabled');
-          scaleInput.removeAttribute('disabled');
-          scaleSlider.removeAttribute('disabled');
-          resolutionInput.removeAttribute('disabled');
-          resolutionSlider.removeAttribute('disabled');
-          saveBtn.removeAttribute('disabled');
-
-          generateBtn.classList.remove('is-loading', 'disabled');
-          canvas.removeAttribute('style');
-          generationMetricsSpan.removeAttribute('style');
-
-          generationMetricsSpan.textContent = `Generated ${values.length} noise values in ${dt}ms`;
-
-          if (!ui.querySelector('output#time')) rendering = false;
-          renderCount++;
+        const { dt, noiseValues, imgData } = await generateNoiseImage({
+          dimensions: dimensionSelect.value,
+          scale: calculateScale(scaleSlider.value),
+          resolution: resolutionSlider.value / 100,
+          width: canvas.width,
+          height: canvas.height,
         });
+
+        wait().then(() => ctx.putImageData(imgData, 0, 0));
+
+        // re-enble config inputs after rendering
+        algorithmSelect.removeAttribute('disabled');
+        dimensionSelect.removeAttribute('disabled');
+        seedInput.removeAttribute('disabled');
+        scaleInput.removeAttribute('disabled');
+        scaleSlider.removeAttribute('disabled');
+        resolutionInput.removeAttribute('disabled');
+        resolutionSlider.removeAttribute('disabled');
+        saveBtn.removeAttribute('disabled');
+
+        generateBtn.classList.remove('is-loading', 'disabled');
+        canvas.removeAttribute('style');
+        generationMetricsSpan.removeAttribute('style');
+
+        generationMetricsSpan.textContent = `Generated ${noiseValues.length} noise values in ${dt}ms`;
+
+        if (!ui.querySelector('output#time')) rendering = false;
+        renderCount++;
       }, 100);
     };
   })();
@@ -259,6 +242,12 @@
   })();
 
   generateBtn.addEventListener('click', renderNoise);
+  saveBtn.addEventListener('click', () => {
+    const link = document.createElement('a');
+    link.setAttribute('download', algorithmSelect.value + '-noise');
+    link.setAttribute('href', canvas.toDataURL('image/png'));
+    link.click();
+  });
 
   updateCanvasDimensions();
 })();
