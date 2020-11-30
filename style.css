@@ -1,0 +1,53 @@
+* {
+  padding: 0px;
+  margin: 0px;
+}
+
+html,
+body {
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+}
+
+main {
+  display: flex;
+  align-items: center;
+}
+
+canvas {
+  display: block;
+  margin: auto;
+}
+
+#ui {
+  position: absolute;
+}
+
+#ui-handle {
+  cursor: move;
+}
+
+#ui-toggle {
+  cursor: pointer;
+}
+
+@media screen and (max-width: 769px) {
+
+  html,
+  body {
+    overflow: auto;
+  }
+
+  main {
+    display: inline;
+  }
+
+  #ui {
+    position: static;
+  }
+
+  #ui-handle {
+    display: none;
+  }
+}
