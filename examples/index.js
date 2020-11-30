@@ -11,6 +11,8 @@
   const seedInput = ui.querySelector('input[name=seed]');
   const scaleInput = ui.querySelector('input[name=scale]');
   const scaleSlider = ui.querySelector('input[name=scale-slider]');
+  const resolutionInput = ui.querySelector('input[name=resolution]');
+  const resolutionSlider = ui.querySelector('input[name=resolution-slider]');
   const generateBtn = ui.querySelector('button');
 
   const updateCanvasDimensions = () => {
@@ -42,12 +44,31 @@
       // wait on a timeout to allow browser to do it's stuff
       new Promise((resolve) => setTimeout(() => resolve(), 0)).then(() => {
         const ctx = canvas.getContext('2d');
-        const imgData = ctx.createImageData(canvas.width, canvas.height);
+
         const scale = calculateScale(scaleSlider.value);
+        const resolution = resolutionSlider.value / 100;
+
+        const width = Math.floor(canvas.width * resolution) + 1;
+        const height = Math.floor(canvas.height * resolution) + 1;
+
+        const noiseData = new Float64Array(width * height);
+
+        for (let i = 0; i < width; ++i) {
+          for (let j = 0; j < height; ++j) {
+            noiseData[i + j * width] = noise((i / resolution) * scale, (j / resolution) * scale);
+          }
+        }
+
+        const getNoise = (i, j) => {
+          const x = Math.floor(i * resolution);
+          const y = Math.floor(j * resolution);
+          return noiseData[x + y * width];
+        };
+        const imgData = ctx.createImageData(canvas.width, canvas.height);
         for (let i = 0; i < imgData.width; ++i) {
           for (let j = 0; j < imgData.height; ++j) {
             const index = (i + j * imgData.width) * 4;
-            const value = 255 * noise(i * scale, j * scale);
+            const value = 255 * getNoise(i, j);
             imgData.data[index + 0] = value;
             imgData.data[index + 1] = value;
             imgData.data[index + 2] = value;
@@ -173,6 +194,26 @@
       scaleInput.value = calculateScale(scaleSlider.value).toLocaleString(undefined, {
         maximumFractionDigits: 7,
       });
+    });
+  })();
+
+  (function () {
+    let updateResolutionHandle;
+    resolutionInput.addEventListener('keydown', () => {
+      clearTimeout(updateResolutionHandle);
+      if (!resolutionInput.value) return;
+      updateResolutionHandle = setTimeout(() => {
+        if (isNaN(resolutionInput.value) || resolutionInput.value <= 0) {
+          resolutionInput.value = resolutionSlider.value + '%';
+          return;
+        }
+        resolutionSlider.value = scaleInput.value;
+        resolutionInput.value += '%';
+      }, 300);
+    });
+    resolutionSlider.addEventListener('input', () => {
+      clearTimeout(updateResolutionHandle);
+      resolutionInput.value = resolutionSlider.value + '%';
     });
   })();
 
