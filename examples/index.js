@@ -15,6 +15,10 @@
   const resolutionSlider = ui.querySelector('input[name=resolution-slider]');
   const generateBtn = ui.querySelector('button');
 
+  let renderCount = 0;
+
+  seedInput.value = noise.seed;
+
   const updateCanvasDimensions = () => {
     canvas.width = canvas.height = innerWidth > innerHeight ? innerHeight : innerWidth;
   };
@@ -24,74 +28,88 @@
   const configNoise = () =>
     noise.config({ algorithm: algorithmSelect.value, seed: seedInput.value });
 
-  let renderHandle;
-  let rendering = false;
-  let renderCount = 0;
-  const renderNoise = () => {
-    if (rendering) return;
-    clearTimeout(renderHandle);
-    renderHandle = setTimeout(() => {
-      rendering = true;
+  const renderNoise = (() => {
+    let renderHandle;
+    let rendering = false;
+    return () => {
+      if (rendering) return;
+      clearTimeout(renderHandle);
+      renderHandle = setTimeout(() => {
+        rendering = true;
 
-      generateBtn.classList.add('is-loading', 'disabled');
+        generateBtn.classList.add('is-loading', 'disabled');
 
-      // disable config inputs while rendering
-      algorithmSelect.setAttribute('disabled', true);
-      dimensionSelect.setAttribute('disabled', true);
-      seedInput.setAttribute('disabled', true);
-      scaleSlider.setAttribute('disabled', true);
+        // disable config inputs while rendering
+        algorithmSelect.setAttribute('disabled', true);
+        dimensionSelect.setAttribute('disabled', true);
+        seedInput.setAttribute('disabled', true);
+        scaleSlider.setAttribute('disabled', true);
 
-      // wait on a timeout to allow browser to do it's stuff
-      new Promise((resolve) => setTimeout(() => resolve(), 0)).then(() => {
-        const ctx = canvas.getContext('2d');
+        // wait on a timeout to allow browser to do it's stuff
+        new Promise((resolve) => setTimeout(() => resolve(), 0)).then(() => {
+          const ctx = canvas.getContext('2d');
 
-        const scale = calculateScale(scaleSlider.value);
-        const resolution = resolutionSlider.value / 100;
+          const scale = calculateScale(scaleSlider.value);
+          const resolution = resolutionSlider.value / 100;
 
-        const width = Math.floor(canvas.width * resolution) + 1;
-        const height = Math.floor(canvas.height * resolution) + 1;
+          const width = Math.floor(canvas.width * resolution) + 1;
+          const height = Math.floor(canvas.height * resolution) + 1;
 
-        const noiseData = new Float64Array(width * height);
+          const noiseData = new Float64Array(width * height);
 
-        for (let i = 0; i < width; ++i) {
-          for (let j = 0; j < height; ++j) {
-            noiseData[i + j * width] = noise((i / resolution) * scale, (j / resolution) * scale);
+          const start = (performance ?? Date).now();
+          for (let i = 0; i < width; ++i) {
+            for (let j = 0; j < height; ++j) {
+              noiseData[i + j * width] = noise((i / resolution) * scale, (j / resolution) * scale);
+            }
           }
-        }
-
-        const getNoise = (i, j) => {
-          const x = Math.floor(i * resolution);
-          const y = Math.floor(j * resolution);
-          return noiseData[x + y * width];
-        };
-        const imgData = ctx.createImageData(canvas.width, canvas.height);
-        for (let i = 0; i < imgData.width; ++i) {
-          for (let j = 0; j < imgData.height; ++j) {
-            const index = (i + j * imgData.width) * 4;
-            const value = 255 * getNoise(i, j);
-            imgData.data[index + 0] = value;
-            imgData.data[index + 1] = value;
-            imgData.data[index + 2] = value;
-            imgData.data[index + 3] = 255;
+          const dt = (performance ?? Date).now() - start;
+          console.log(dt);
+          const getNoise = (i, j) => {
+            const x = Math.floor(i * resolution);
+            const y = Math.floor(j * resolution);
+            return noiseData[x + y * width];
+          };
+          const imgData = ctx.createImageData(canvas.width, canvas.height);
+          for (let i = 0; i < imgData.width; ++i) {
+            for (let j = 0; j < imgData.height; ++j) {
+              const index = (i + j * imgData.width) * 4;
+              const value = 255 * getNoise(i, j);
+              imgData.data[index + 0] = value;
+              imgData.data[index + 1] = value;
+              imgData.data[index + 2] = value;
+              imgData.data[index + 3] = 255;
+            }
           }
-        }
-        ctx.putImageData(imgData, 0, 0);
+          ctx.putImageData(imgData, 0, 0);
 
-        // re-enble config inputs after rendering
-        algorithmSelect.removeAttribute('disabled');
-        dimensionSelect.removeAttribute('disabled');
-        seedInput.removeAttribute('disabled');
-        scaleSlider.removeAttribute('disabled');
+          // re-enble config inputs after rendering
+          algorithmSelect.removeAttribute('disabled');
+          dimensionSelect.removeAttribute('disabled');
+          seedInput.removeAttribute('disabled');
+          scaleSlider.removeAttribute('disabled');
 
-        generateBtn.classList.remove('is-loading', 'disabled');
-        canvas.removeAttribute('style');
+          generateBtn.classList.remove('is-loading', 'disabled');
+          canvas.removeAttribute('style');
 
-        if (!ui.querySelector('output#time')) rendering = false;
-        renderCount++;
-      });
-    }, 100);
-  };
-  seedInput.value = noise.seed;
+          ui.querySelector('#generation-metrics').textContent = `Generated ${
+            width * height
+          } noise values in ${dt.toLocaleString(undefined, {
+            maximumFractionDigits: 2,
+          })}ms`;
+
+          if (!ui.querySelector('output#time')) rendering = false;
+          renderCount++;
+        });
+      }, 100);
+    };
+  })();
+
+  window.addEventListener('resize', () => {
+    updateCanvasDimensions();
+    if (renderCount) renderNoise();
+  });
+
   ui.addEventListener('mousedown', (e) => {
     if (!e.target.closest('#ui-handle')) return;
     e.preventDefault();
@@ -152,11 +170,6 @@
       }
     });
   })();
-
-  window.addEventListener('resize', () => {
-    updateCanvasDimensions();
-    if (renderCount) renderNoise();
-  });
 
   (function () {
     let configNoiseHandle;
