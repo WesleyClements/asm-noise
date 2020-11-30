@@ -135,7 +135,7 @@ Default:
   y: (4691 * (1 + Math.sqrt(5))) / 2,
   z: (10093 * (1 + Math.sqrt(5))) / 2,
   w: (9241 * (1 + Math.sqrt(5))) / 2,
-  }
+}
 ```
 
 ## [Roadmap](#roadmap)
