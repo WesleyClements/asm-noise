@@ -1,7 +1,11 @@
 (function () {
   const main = document.querySelector('main');
+
   const canvas = main.querySelector('canvas');
   const ui = main.querySelector('#ui');
+  const uiToggle = ui.querySelector('#ui-toggle');
+  const uiContent = ui.querySelector('#ui-content');
+
   const algorithmSelect = ui.querySelector('#algorithm-select');
   const dimensionSelect = ui.querySelector('#dimension-select');
   const seedInput = ui.querySelector('input[name=seed]');
@@ -66,13 +70,73 @@
       });
     }, 100);
   };
-
   seedInput.value = noise.seed;
+  ui.addEventListener('mousedown', (e) => {
+    if (!e.target.closest('#ui-handle')) return;
+    e.preventDefault();
+
+    const rect = ui.getBoundingClientRect();
+    const { width, height } = rect;
+    const xOffset = 2 * (rect.x - e.x);
+    const yOffset = 2 * (rect.y - e.y);
+
+    const onMouseMove = (e) => {
+      e.preventDefault();
+      ui.style.top = e.pageY + yOffset + 'px';
+      ui.style.left = e.pageX + xOffset + 'px';
+      ui.style.bottom = null;
+      ui.style.right = null;
+    };
+    const finalizeMove = (e) => {
+      e.preventDefault();
+      let { x, y } = ui.getBoundingClientRect();
+
+      if (y < 0) {
+        ui.style.top = 0;
+        ui.style.bottom = null;
+      } else if (y + height > innerHeight) {
+        ui.style.top = null;
+        ui.style.bottom = 0;
+      } else {
+        ui.style.bottom = null;
+      }
+      if (x < 0) {
+        ui.style.left = 0;
+        ui.style.right = null;
+      } else if (x + width > innerWidth) {
+        ui.style.left = null;
+        ui.style.right = 0;
+      } else {
+        ui.style.right = null;
+      }
+      document.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', finalizeMove);
+      document.removeEventListener('blur', finalizeMove);
+    };
+    document.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', finalizeMove);
+    document.addEventListener('blur', finalizeMove);
+  });
+
+  (function () {
+    let showUI = true;
+    uiToggle.addEventListener('click', () => {
+      showUI = !showUI;
+      if (showUI) {
+        uiToggle.innerHTML = `<i class="fas fa-minus"></i>`;
+        uiContent.removeAttribute('style');
+      } else {
+        uiToggle.innerHTML = `<i class="fas fa-plus"></i>`;
+        uiContent.style.display = 'none';
+      }
+    });
+  })();
 
   window.addEventListener('resize', () => {
     updateCanvasDimensions();
     if (renderCount) renderNoise();
   });
+
   (function () {
     let configNoiseHandle;
 
@@ -91,6 +155,7 @@
       }, 300);
     });
   })();
+
   (function () {
     let updateScaleHandle;
     scaleInput.addEventListener('keydown', () => {
@@ -110,6 +175,7 @@
       });
     });
   })();
+
   generateBtn.addEventListener('click', renderNoise);
 
   updateCanvasDimensions();
