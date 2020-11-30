@@ -110,7 +110,7 @@
 
         generationMetricsSpan.textContent = `Generated ${noiseValues.length} noise values in ${dt}ms`;
 
-        if (!ui.querySelector('output#time')) rendering = false;
+        rendering = false;
         renderCount++;
       }, 100);
     };
