@@ -72,7 +72,7 @@
     You need to enable JavaScript to run this app.
   </noscript>
   <main>
-    <div id="ui" class="section box m-5 px-3 py-3" style="top:0;left:0;">
+    <div id="ui" class="section box m-5 px-3 pt-3 pb-0" style="top:0;left:0;">
       <div class="is-flex is-justify-content-space-between">
         <div>
           <span id="ui-handle" class="icon">
@@ -148,9 +148,16 @@
           </div>
         </div>
         <hr />
-        <button class="button is-fullwidth">Generate</button>
+        <div class="columns">
+          <div class="column pb-0">
+            <button class="button p-0 is-fullwidth">Generate</button>
+          </div>
+          <div class="column pb-0">
+            <a class="button p-0 is-fullwidth">Save</a>
+          </div>
+        </div>
         <div class="is-flex is-justify-content-center is-align-content-center">
-          <span id="generation-metrics" class="mt-2" style="display: none;"></span>
+          <span id="generation-metrics" class="mb-1" style="display: none;"></span>
         </div>
       </div>
     </div>
