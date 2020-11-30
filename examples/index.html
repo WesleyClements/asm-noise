@@ -16,8 +16,16 @@
     html,
     body {
       overflow: hidden;
+      scrollbar-width: none;
       width: 100vw;
       height: 100vh;
+    }
+
+    main {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 100%;
       background-color: whitesmoke;
     }
 
@@ -28,8 +36,14 @@
 
     #ui {
       position: absolute;
-      top: 0;
-      left: 0;
+    }
+
+    #ui-handle {
+      cursor: move;
+    }
+
+    #ui-toggle {
+      cursor: pointer;
     }
 
     @media screen and (max-width: 769px) {
@@ -39,11 +53,20 @@
         overflow: auto;
       }
 
+      main {
+        display: inline;
+      }
+
       #ui {
-        position: relative;
+        position: static;
+      }
+
+      #ui-handle {
+        display: none;
       }
     }
   </style>
+  <script src="https://kit.fontawesome.com/843d7dd4d0.js" crossorigin="anonymous"></script>
   <title>asm-noise</title>
 </head>
 
@@ -52,57 +75,84 @@
     You need to enable JavaScript to run this app.
   </noscript>
   <main>
-    <div id="ui" class="section box m-5 px-5 py-3">
-      <div class="field">
-        <label class="label">Algorithm</label>
-        <div class="field-body">
-          <div class="field has-addons">
-            <div class="control">
-              <div class="select">
-                <select id="algorithm-select">
-                  <option value="open-simplex" selected>OpenSimplex</option>
-                  <option value="perlin">Perlin</option>
-                </select>
-              </div>
-            </div>
-            <div class="control">
-              <div class="select">
-                <select id="dimension-select">
-                  <option value="2" selected>2D</option>
-                  <option value="3">3D</option>
-                  <option value="4">4D</option>
-                </select>
-              </div>
-            </div>
-          </div>
+    <div id="ui" class="section box m-5 px-3 py-3" style="top:0;left:0;">
+      <div class="is-flex is-justify-content-space-between">
+        <div>
+          <span id="ui-handle" class="icon">
+            <i class="fas fa-bars"></i>
+          </span>
         </div>
+        <span id="ui-toggle" class="icon">
+          <i class="fas fa-minus"></i>
+        </span>
       </div>
-
-      <div class="field">
-        <label class="label">Seed</label>
-        <div class="control">
-          <input type="text" class="input" name="seed" />
-        </div>
-      </div>
-      <hr />
-      <div class="field">
-        <label class="label">Scale</label>
-        <div class="field-body">
-          <div class="field is-grouped is-grouped-multiline">
-            <div class="columns">
-              <div class="column control is-one-third">
-                <input type="text" class="input" name="scale" value="0.01" />
+      <div id="ui-content" class="m-3">
+        <div class="field">
+          <label class="label">Algorithm</label>
+          <div class="field-body">
+            <div class="field has-addons">
+              <div class="control">
+                <div class="select">
+                  <select id="algorithm-select">
+                    <option value="open-simplex" selected>OpenSimplex</option>
+                    <option value="perlin">Perlin</option>
+                  </select>
+                </div>
               </div>
-              <div class="column control">
-                <input type="range" class="slider is-fullwidth" name="scale-slider" min="-3" max="2" step="0.1"
-                  value="-2" />
+              <div class="control">
+                <div class="select">
+                  <select id="dimension-select">
+                    <option value="2" selected>2D</option>
+                    <option value="3">3D</option>
+                    <option value="4">4D</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        <div class="field">
+          <label class="label">Seed</label>
+          <div class="control">
+            <input type="text" class="input" name="seed" />
+          </div>
+        </div>
+        <hr />
+        <div class="field">
+          <label class="label">Noise Scale</label>
+          <div class="field-body">
+            <div class="field is-grouped is-grouped-multiline">
+              <div class="columns">
+                <div class="column control is-one-third">
+                  <input type="text" class="input" name="scale" value="0.01" />
+                </div>
+                <div class="column control">
+                  <input type="range" class="slider is-fullwidth" name="scale-slider" min="-3" max="2" step="0.1"
+                    value="-2" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Resolution</label>
+          <div class="field-body">
+            <div class="field is-grouped is-grouped-multiline">
+              <div class="columns">
+                <div class="column control is-one-third">
+                  <input type="text" class="input" name="resolution" value="0.01" />
+                </div>
+                <div class="column control">
+                  <input type="range" class="slider is-fullwidth" name="resolution-slider" min="-3" max="2" step="0.1"
+                    value="-2" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr />
+        <button class="button is-fullwidth">Generate</button>
       </div>
-      <hr />
-      <button class="button is-fullwidth mb-2">Generate</button>
     </div>
     <canvas id="noise-canvas" style="display: none;"></canvas>
   </main>
