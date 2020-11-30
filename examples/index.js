@@ -34,6 +34,8 @@
     for (let i = 0; i < width; ++i) {
       for (let j = 0; j < height; ++j) {
         points[i + j * width] = [(i / resolution) * scale, (j / resolution) * scale];
+        if (dimensionSelect.value > 2) points[i + j * width].push((i / resolution) * scale);
+        if (dimensionSelect.value > 3) points[i + j * width].push((j / resolution) * scale);
       }
     }
     const values = new Float64Array(width * height);
