@@ -9,6 +9,7 @@
   "scripts": {
     "start": "webpack-dev-server --open --config webpack/webpack.development.js",
     "build": "webpack --config webpack/webpack.production.js",
+    "build:asm": "docker run --rm -v $(pwd):/src emscripten/emsdk:1.40.1-fastcomp emcc ./src/helloworld.cpp -o ./src/helloworld.js -s WASM=0",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
