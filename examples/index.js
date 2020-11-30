@@ -13,7 +13,8 @@
   const scaleSlider = ui.querySelector('input[name=scale-slider]');
   const resolutionInput = ui.querySelector('input[name=resolution]');
   const resolutionSlider = ui.querySelector('input[name=resolution-slider]');
-  const generateBtn = ui.querySelector('button');
+  const generateBtn = ui.querySelector('#generate-btn');
+  const saveBtn = ui.querySelector('#save-btn');
   const generationMetricsSpan = ui.querySelector('#generation-metrics');
   let renderCount = 0;
 
@@ -29,11 +30,18 @@
     noise.config({ algorithm: algorithmSelect.value, seed: seedInput.value });
 
   const generateNoiseValues = ({ scale, resolution, width, height }) => {
+    const points = new Array(width * height);
+    for (let i = 0; i < width; ++i) {
+      for (let j = 0; j < height; ++j) {
+        points[i + j * width] = [(i / resolution) * scale, (j / resolution) * scale];
+      }
+    }
     const values = new Float64Array(width * height);
     const start = (performance ?? Date).now();
     for (let i = 0; i < width; ++i) {
       for (let j = 0; j < height; ++j) {
-        values[i + j * width] = noise((i / resolution) * scale, (j / resolution) * scale);
+        const index = i + j * width;
+        values[index] = noise(...points[index]);
       }
     }
     const dt = (performance ?? Date).now() - start;
@@ -65,7 +73,11 @@
         algorithmSelect.setAttribute('disabled', true);
         dimensionSelect.setAttribute('disabled', true);
         seedInput.setAttribute('disabled', true);
+        scaleInput.setAttribute('disabled', true);
         scaleSlider.setAttribute('disabled', true);
+        resolutionInput.setAttribute('disabled', true);
+        resolutionSlider.setAttribute('disabled', true);
+        saveBtn.setAttribute('disabled', true);
 
         // wait on a timeout to allow browser to do it's stuff
         new Promise((resolve) => setTimeout(() => resolve(), 0)).then(() => {
@@ -93,11 +105,18 @@
           }
           ctx.putImageData(imgData, 0, 0);
 
+          saveBtn.setAttribute('download', algorithmSelect.value + '-noise');
+          saveBtn.setAttribute('href', canvas.toDataURL('image/png'));
+
           // re-enble config inputs after rendering
           algorithmSelect.removeAttribute('disabled');
           dimensionSelect.removeAttribute('disabled');
           seedInput.removeAttribute('disabled');
+          scaleInput.removeAttribute('disabled');
           scaleSlider.removeAttribute('disabled');
+          resolutionInput.removeAttribute('disabled');
+          resolutionSlider.removeAttribute('disabled');
+          saveBtn.removeAttribute('disabled');
 
           generateBtn.classList.remove('is-loading', 'disabled');
           canvas.removeAttribute('style');
