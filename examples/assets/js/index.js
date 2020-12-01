@@ -7,6 +7,7 @@
   const uiToggle = ui.querySelector('#ui-toggle');
   const uiContent = ui.querySelector('#ui-content');
 
+  // config inputs
   const algorithmSelect = ui.querySelector('#algorithm-select');
   const dimensionSelect = ui.querySelector('#dimension-select');
   const seedInput = ui.querySelector('input[name=seed]');
@@ -16,7 +17,21 @@
   const resolutionSlider = ui.querySelector('input[name=resolution-slider]');
   const generateBtn = ui.querySelector('#generate-btn');
   const saveBtn = ui.querySelector('#save-btn');
+
+  const configInputs = [
+    algorithmSelect,
+    dimensionSelect,
+    seedInput,
+    scaleInput,
+    scaleSlider,
+    resolutionInput,
+    resolutionSlider,
+    generateBtn,
+    saveBtn,
+  ];
+
   const generationMetricsSpan = ui.querySelector('#generation-metrics');
+
   let renderCount = 0;
 
   seedInput.value = noise.seed;
@@ -32,23 +47,23 @@
   const configNoise = () =>
     noise.config({ algorithm: algorithmSelect.value, seed: seedInput.value });
 
+  const getNoiseImageFromWorker =
+    noiseWorker &&
+    (async (settings) => {
+      return await new Promise((resolve, reject) => {
+        const onMessage = (e) => {
+          noiseWorker.removeEventListener('message', onMessage);
+          resolve(e.data);
+        };
+        noiseWorker.addEventListener('message', onMessage);
+        noiseWorker.postMessage(settings);
+      });
+    });
+
   const generateNoiseImage = async ({ dimensions, scale, resolution, width, height }) => {
-    const { dt, noiseValues, imgData } = await (noiseWorker
-      ? new Promise((resolve, reject) => {
-          const onMessage = (e) => {
-            noiseWorker.removeEventListener('message', onMessage);
-            resolve(e.data);
-          };
-          noiseWorker.addEventListener('message', onMessage);
-          noiseWorker.postMessage({ dimensions, scale, resolution, width, height });
-        })
-      : generateNoiseImageSync({
-          dimensions,
-          scale,
-          resolution,
-          width,
-          height,
-        }));
+    const settings = { dimensions, scale, resolution, width, height };
+    const generate = getNoiseImageFromWorker ?? generateNoiseImageSync;
+    const { dt, noiseValues, imgData } = await generate(settings);
     return {
       dt: dt.toLocaleString(undefined, {
         maximumFractionDigits: 2,
@@ -70,19 +85,10 @@
         generateBtn.classList.add('is-loading', 'disabled');
 
         // disable config inputs while rendering
-        algorithmSelect.setAttribute('disabled', true);
-        dimensionSelect.setAttribute('disabled', true);
-        seedInput.setAttribute('disabled', true);
-        scaleInput.setAttribute('disabled', true);
-        scaleSlider.setAttribute('disabled', true);
-        resolutionInput.setAttribute('disabled', true);
-        resolutionSlider.setAttribute('disabled', true);
-        saveBtn.setAttribute('disabled', true);
+        configInputs.forEach((configInput) => configInput.setAttribute('disabled', true));
 
         // wait on a timeout to allow browser to do it's stuff
         await wait();
-
-        const ctx = canvas.getContext('2d');
 
         const { dt, noiseValues, imgData } = await generateNoiseImage({
           dimensions: dimensionSelect.value,
@@ -92,23 +98,18 @@
           height: canvas.height,
         });
 
-        wait().then(() => ctx.putImageData(imgData, 0, 0));
-
         // re-enble config inputs after rendering
-        algorithmSelect.removeAttribute('disabled');
-        dimensionSelect.removeAttribute('disabled');
-        seedInput.removeAttribute('disabled');
-        scaleInput.removeAttribute('disabled');
-        scaleSlider.removeAttribute('disabled');
-        resolutionInput.removeAttribute('disabled');
-        resolutionSlider.removeAttribute('disabled');
-        saveBtn.removeAttribute('disabled');
+        configInputs.forEach((configInput) => configInput.removeAttribute('disabled'));
 
         generateBtn.classList.remove('is-loading', 'disabled');
-        canvas.removeAttribute('style');
-        generationMetricsSpan.removeAttribute('style');
+        [canvas, generationMetricsSpan].forEach((hiddenEl) => (hiddenEl.style.display = null));
 
         generationMetricsSpan.textContent = `Generated ${noiseValues.length} noise values in ${dt}ms`;
+
+        // render image to screen after the browser does it's stuff
+        await wait();
+        const ctx = canvas.getContext('2d');
+        ctx.putImageData(imgData, 0, 0);
 
         rendering = false;
         renderCount++;
