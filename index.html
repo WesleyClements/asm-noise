@@ -7,7 +7,7 @@
   <link rel="icon" href="https://p5js.org/assets/img/favicon.ico" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
   <link rel="stylesheet" href="https://unpkg.com/bulma-slider@2.0.4/dist/css/bulma-slider.min.css">
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./assets/css/style.css">
   <script src="https://kit.fontawesome.com/843d7dd4d0.js" crossorigin="anonymous"></script>
   <title>asm-noise</title>
 </head>
@@ -17,13 +17,14 @@
     You need to enable JavaScript to run this app.
   </noscript>
   <main>
-    <div id="ui" class="section box m-5 px-3 pt-3 pb-0" style="top:0;left:0;">
-      <div class="is-flex is-justify-content-space-between">
+    <div id="ui" class="section box m-5 px-3 py-3" style="top:0;left:0;">
+      <div class="is-flex is-justify-content-space-between is-align-items-flex-start">
         <div>
           <span id="ui-handle" class="icon">
             <i class="fas fa-bars"></i>
           </span>
         </div>
+        <h4 class="title is-4 mx-5 mb-0">Noise</h4>
         <span id="ui-toggle" class="icon">
           <i class="fas fa-minus"></i>
         </span>
@@ -93,23 +94,24 @@
           </div>
         </div>
         <hr />
-        <div class="columns">
+        <div class="columns is-mobile">
           <div class="column pb-0">
             <button id="generate-btn" class="button p-0 is-fullwidth">Generate</button>
           </div>
           <div class="column pb-0">
-            <a id="save-btn" class="button p-0 is-fullwidth" disabled>Save</a>
+            <button id="save-btn" class="button p-0 is-fullwidth" disabled>Save</button>
           </div>
         </div>
         <div class="is-flex is-justify-content-center is-align-content-center">
-          <span id="generation-metrics" class="mb-1" style="display: none;"></span>
+          <span id="generation-metrics" class="mt-2" style="display: none;"></span>
         </div>
       </div>
     </div>
     <canvas id="noise-canvas" style="display: none;"></canvas>
   </main>
   <script src="https://unpkg.com/asm-noise@1.0.2/dist/asm-noise.js"></script>
-  <script src="index.js"></script>
+  <script src="./assets/js/noiseImageGeneration.js"></script>
+  <script src="./assets/js/index.js"></script>
 </body>
 
 </html>
