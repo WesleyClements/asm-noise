@@ -9,7 +9,8 @@
   "scripts": {
     "start": "webpack-dev-server --open --config webpack/webpack.development.js",
     "build": "webpack --config webpack/webpack.production.js",
-    "build:asm": "docker run --rm -v $(pwd):/src emscripten/emsdk:1.40.1-fastcomp emcc ./src/helloworld.cpp -o ./src/helloworld.js -s WASM=0",
+    "build:asm": "docker run --rm -v $(pwd):/src trzeci/emscripten:1.39.18-fastcomp emcc ./emscripten/helloworld.cpp -o ./emscripten/helloworld.js -s WASM=0",
+    "deploy": "npx gh-pages -d examples",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -46,5 +47,8 @@
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0",
     "webpack-merge": "^5.1.2"
+  },
+  "dependencies": {
+    "gh-pages": "^3.1.0"
   }
 }
