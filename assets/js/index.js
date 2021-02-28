@@ -1,4 +1,4 @@
-(function () {
+(() => {
   const noiseWorker = window.Worker ? new Worker('./assets/js/noiseWorker.js') : null;
   const main = document.querySelector('main');
 
@@ -61,7 +61,15 @@
     });
 
   const generateNoiseImage = async ({ dimensions, scale, resolution, width, height }) => {
-    const settings = { dimensions, scale, resolution, width, height };
+    const settings = {
+      seed: noise.seed,
+      algorithm: noise.algorithm,
+      dimensions,
+      scale,
+      resolution,
+      width,
+      height
+    };
     const generate = getNoiseImageFromWorker ?? generateNoiseImageSync;
     const { dt, noiseValues, imgData } = await generate(settings);
     return {
@@ -109,6 +117,7 @@
         // render image to screen after the browser does it's stuff
         await wait();
         const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.putImageData(imgData, 0, 0);
 
         rendering = false;
