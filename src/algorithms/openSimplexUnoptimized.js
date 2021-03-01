@@ -1,7 +1,7 @@
-import random from '../util/random';
+import random from "../util/random";
 
 function OpenSimplexUnoptimized(stdlib, foreign, heap) {
-  'use asm';
+  "use asm";
 
   var imul = stdlib.Math.imul;
   var floor = stdlib.Math.floor;
@@ -2689,7 +2689,7 @@ const heap = new ArrayBuffer(0x100000);
       0.07491495712999985,  0.07491495712999985,  3.29965982852,
       1.4082482904633333,  1.4082482904633333,  2.6329931618533333,
       -0.24732126143473554,  1.6667938651159684,  2.838945207362466,
-      1.6667938651159684,  -0.24732126143473554,  2.838945207362466
+      1.6667938651159684,  -0.24732126143473554,  2.838945207362466,
     ].map((n) => n / 26.92263139946168);
 
     for (let i = 0; i < 3 * 0x800; i++) {
