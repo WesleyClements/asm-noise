@@ -1,7 +1,7 @@
-import random from '../util/random';
+import random from "../util/random";
 
 function Perlin(stdlib, foreign, heap) {
-  'use asm';
+  "use asm";
 
   var floor = stdlib.Math.floor;
 
@@ -84,16 +84,16 @@ function Perlin(stdlib, foreign, heap) {
     var grad = 0.0;
     hash = hash & 0xf;
     switch (hash >> 2) {
-      case 0b00:
-        grad = (hash & 0b01 ? x : -x) + (hash & 0b10 ? y : -y);
-        break;
-      case 0b01:
-        return hash & 0b01 ? x : -x;
-      case 0b10:
-        return hash & 0b10 ? y : -y;
-      case 0b11:
-        grad = (hash & 0b01 ? -x : x) + (hash & 0b10 ? -y : y);
-        break;
+    case 0b00:
+      grad = (hash & 0b01 ? x : -x) + (hash & 0b10 ? y : -y);
+      break;
+    case 0b01:
+      return hash & 0b01 ? x : -x;
+    case 0b10:
+      return hash & 0b10 ? y : -y;
+    case 0b11:
+      grad = (hash & 0b01 ? -x : x) + (hash & 0b10 ? -y : y);
+      break;
     }
     return grad;
   }
@@ -162,54 +162,54 @@ function Perlin(stdlib, foreign, heap) {
     z = +z;
     var grad = 0.09;
     switch (hash & 0xf) {
-      case 0:
-        grad = x + y;
-        break;
-      case 1:
-        grad = -x + y;
-        break;
-      case 2:
-        grad = x - y;
-        break;
-      case 3:
-        grad = -x - y;
-        break;
-      case 4:
-        grad = x + z;
-        break;
-      case 5:
-        grad = -x + z;
-        break;
-      case 6:
-        grad = x - z;
-        break;
-      case 7:
-        grad = -x - z;
-        break;
-      case 8:
-        grad = y + z;
-        break;
-      case 9:
-        grad = -y + z;
-        break;
-      case 10:
-        grad = y - z;
-        break;
-      case 11:
-        grad = -y - z;
-        break;
-      case 12:
-        grad = y + x;
-        break;
-      case 13:
-        grad = -x + y;
-        break;
-      case 14:
-        grad = -y + z;
-        break;
-      case 15:
-        grad = -y - z;
-        break;
+    case 0:
+      grad = x + y;
+      break;
+    case 1:
+      grad = -x + y;
+      break;
+    case 2:
+      grad = x - y;
+      break;
+    case 3:
+      grad = -x - y;
+      break;
+    case 4:
+      grad = x + z;
+      break;
+    case 5:
+      grad = -x + z;
+      break;
+    case 6:
+      grad = x - z;
+      break;
+    case 7:
+      grad = -x - z;
+      break;
+    case 8:
+      grad = y + z;
+      break;
+    case 9:
+      grad = -y + z;
+      break;
+    case 10:
+      grad = y - z;
+      break;
+    case 11:
+      grad = -y - z;
+      break;
+    case 12:
+      grad = y + x;
+      break;
+    case 13:
+      grad = -x + y;
+      break;
+    case 14:
+      grad = -y + z;
+      break;
+    case 15:
+      grad = -y - z;
+      break;
     }
     return grad;
   }
@@ -308,12 +308,12 @@ function Perlin(stdlib, foreign, heap) {
     w = +w;
     hash = hash & 0x1f;
     switch (hash >> 3) {
-      case 0b01:
-        return ((hash & 4) == 0 ? -w : w) + ((hash & 2) == 0 ? -x : x) + ((hash & 1) == 0 ? -y : y);
-      case 0b10:
-        return ((hash & 4) == 0 ? -z : z) + ((hash & 2) == 0 ? -w : w) + ((hash & 1) == 0 ? -x : x);
-      case 0b11:
-        return ((hash & 4) == 0 ? -y : y) + ((hash & 2) == 0 ? -z : z) + ((hash & 1) == 0 ? -w : w);
+    case 0b01:
+      return ((hash & 4) == 0 ? -w : w) + ((hash & 2) == 0 ? -x : x) + ((hash & 1) == 0 ? -y : y);
+    case 0b10:
+      return ((hash & 4) == 0 ? -z : z) + ((hash & 2) == 0 ? -w : w) + ((hash & 1) == 0 ? -x : x);
+    case 0b11:
+      return ((hash & 4) == 0 ? -y : y) + ((hash & 2) == 0 ? -z : z) + ((hash & 1) == 0 ? -w : w);
     }
     return ((hash & 4) == 0 ? -x : x) + ((hash & 2) == 0 ? -y : y) + ((hash & 1) == 0 ? -z : z);
   }
