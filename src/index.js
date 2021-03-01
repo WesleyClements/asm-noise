@@ -1,115 +1,121 @@
-import algorithms from "./algorithms";
+import algorithms, { defaultAlgorithm } from "./algorithms";
+
+const GOLDEN_RATIO = (1 + Math.sqrt(5)) / 2;
 
 const algorithmMap = new Map(Object.entries(algorithms));
-console.log(algorithmMap);
-let algorithm = "open-simplex";
-let octaves = 8;
-let lacunarity = (1 + Math.sqrt(5)) / 2;
-let persistence = Math.abs(1 - Math.sqrt(5)) / 2;
+const algorithmArray = Array.from(algorithmMap.keys()).sort();
 
-const offset = new Proxy(
-  {
-    x: 5393 * lacunarity,
-    y: 4691 * lacunarity,
-    z: 10093 * lacunarity,
-    w: 9241 * lacunarity,
-  }, 
-  {
-    set(obj, prop, value) {
-      if (!/^x|y|z|y$/.test(prop)) Reflect.set(...arguments);
-      if (typeof value !== "number") throw TypeError(`offset.${prop} must be a number`);
-      if (Number.isNaN(value)) throw RangeError(`offset.${prop} cannot be NaN`);
-      if (Number.is(value)) throw RangeError(`offset.${prop} cannot be NaN`);
-      obj[prop] = value;
+const settings = {
+  algorithm: defaultAlgorithm,
+  octaves: 8,
+  lacunarity: GOLDEN_RATIO,
+  persistence: GOLDEN_RATIO - 1,
+  offset: new Proxy(
+    {
+      x: 5393 * GOLDEN_RATIO,
+      y: 4691 * GOLDEN_RATIO,
+      z: 10093 * GOLDEN_RATIO,
+      w: 9241 * GOLDEN_RATIO,
     },
-  }
-);
+    {
+      set(obj, prop, value) {
+        if (!["x","y","z","w"].includes(prop)) Reflect.set(obj, prop, value);
+        if (typeof value !== "number") throw TypeError(`offset.${prop} must be a number`);
+        if (Number.isNaN(value)) throw RangeError(`offset.${prop} cannot be NaN`);
+        obj[prop] = value;
+      },
+    }
+  ),
+};
 
 const noise = Object.defineProperties(
   function noise(x, y, z, w) {
-    if (arguments.length < 2) return;
-    switch (arguments.length) {
-    case 2:
-      return algorithmMap
-        .get(algorithm)
-        .noise2D(octaves, lacunarity, persistence, offset.x, offset.y, x, y);
-    case 3:
-      return algorithmMap
-        .get(algorithm)
-        .noise3D(octaves, lacunarity, persistence, offset.x, offset.y, offset.z, x, y, z);
-    default:
-      return algorithmMap
-        .get(algorithm)
-        .noise4D(
-          octaves,
-          lacunarity,
-          persistence,
-          offset.x,
-          offset.y,
-          offset.z,
-          offset.w,
-          x,
-          y,
-          z,
-          w
-        );
-    }
+    const dimensions = arguments.length;
+    if (dimensions < 2) return;
+    const algorithm = algorithmMap.get(settings.algorithm);
+    const noiseFunc = (() => {
+      switch (dimensions) {
+      case 2:
+        return algorithm.noise2D;
+      case 3:
+        return algorithm.noise3D;
+      default:
+        return algorithm.noise4D;
+      }
+    })();
+    return noiseFunc(
+      settings.octaves,
+      settings.lacunarity,
+      settings.persistence,
+      settings.offset.x,
+      settings.offset.y,
+      x,
+      y,
+      z,
+      w
+    );
   },
   {
     config: {
       value(options) {
         if (options == null) return;
         Object.entries(options)
+          .filter(([key]) => Reflect.has(settings, key))
           .forEach(([key, value]) => this[key] = value);
+        return; 
       },
     },
+    algorithms: {
+      get: () => Array.from(algorithmArray),
+    },
     algorithm: {
-      get: () => algorithm,
+      get: () => settings.algorithm,
       set(value) {
         if (typeof value !== "string") throw TypeError("algorithm must be a string");
         if (!algorithmMap.has(value)) throw Error(`invalid algorithm: ${value}`);
-        algorithm = value;
+        settings.algorithm = value;
       },
     },
     seed: {
-      get: () => algorithmMap.get(algorithm).seed,
+      get: () => algorithmMap.get(settings.algorithm).seed,
       set(value) {
-        algorithmMap.get(algorithm).seed = value;
+        algorithmMap.get(settings.algorithm).seed = value;
       },
     },
     octaves: {
-      get: () => octaves,
+      get: () => settings.octaves,
       set(value) {
         if (typeof value !== "number") throw TypeError("octave must be a number");
         if (Number.isNaN(value)) throw RangeError("octave cannot be NaN");
         if (value < 1) throw RangeError("octave must greater than 0");
-        octaves = value;
+        settings.octaves = value;
       },
     },
     lacunarity: {
-      get: () => lacunarity,
+      get: () => settings.lacunarity,
       set(value) {
         if (typeof value !== "number") throw TypeError("lacunarity must be a number");
         if (value === 0) throw RangeError("lacunarity must not be 0");
-        lacunarity = value;
+        settings.lacunarity = value;
       },
     },
     persistence: {
-      get: () => persistence,
+      get: () => settings.persistence,
       set(value) {
         if (typeof value !== "number") throw TypeError("persistence must be a number");
         if (Number.isNaN(value)) throw RangeError("persistence cannot be NaN");
         if (value === 0) throw RangeError("persistence must not be 0");
-        persistence = value;
+        settings.persistence = value;
       },
     },
     offset: {
-      get: () => offset,
+      get: () => settings.offset,
       set(value) {
         if (typeof value != "object") throw TypeError("offset must be a object");
         if (value === null) throw TypeError("offset must not be null");
         Object.entries(value)
-          .forEach(([key, value]) => offset[key] = value);
+          .filter(([key]) => Reflect.has(settings, key))
+          .forEach(([key, value]) => settings.offset[key] = value);
       },
     },
   }

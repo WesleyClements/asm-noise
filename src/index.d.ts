@@ -21,6 +21,7 @@ declare module 'asm-noise' {
   function noise(x: number, y: number, z: number, w: number): number;
   namespace noise {
     export let seed: number;
+    export let algorithms: ['open-simplex', 'perlin'];
     export let algorithm: 'perlin' | 'open-simplex';
     export let octaves: number;
     export let lacunarity: number;
