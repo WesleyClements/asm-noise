@@ -3,8 +3,37 @@ const noise = require("../../dist/asm-noise");
 describe("noise", () => {
   const getTypesExcept = (type) => [undefined, null, true, 1, 1n, Symbol(), {}, () => {}].filter(value => typeof value !== type);
 
+  const getRandomNumber = () => (2*Math.random() - 1) * Number.MAX_SAFE_INTEGER;
+
   it("should export a function", () => {
     expect(typeof noise).toBe("function");
+  });
+  
+  it("should return a number when given 2 arguments", () => {
+    noise.algorithms.forEach((algorithm) => {
+      noise.algorithm = algorithm;
+      Array(100).fill().forEach(() => {
+        expect(noise(getRandomNumber(), getRandomNumber())).toEqual(expect.any(Number));
+      });
+    });
+  });
+  
+  it("should return a number when given 3 arguments", () => {
+    noise.algorithms.forEach((algorithm) => {
+      noise.algorithm = algorithm;
+      Array(100).fill().forEach(() => {
+        expect(noise(getRandomNumber(), getRandomNumber(), getRandomNumber())).toEqual(expect.any(Number));
+      });
+    });
+  });
+  
+  it("should return a number when given 4 arguments", () => {
+    noise.algorithms.forEach((algorithm) => {
+      noise.algorithm = algorithm;
+      Array(100).fill().forEach(() => {
+        expect(noise(getRandomNumber(), getRandomNumber(), getRandomNumber(), getRandomNumber())).toEqual(expect.any(Number));
+      });
+    });
   });
 
   describe("algorithm", () => {
@@ -35,7 +64,7 @@ describe("noise", () => {
       expect(noise.seed).toEqual(expect.any(Number));
     });
     it("gets set to a number", () => {
-      Array(100).fill(() => (2 * Math.random() - 1) * Number.MAX_SAFE_INTEGER)
+      Array(100).fill(() => getRandomNumber())
         .map(generator => generator())
         .forEach(seed => {
           noise.seed = seed;
@@ -64,7 +93,7 @@ describe("noise", () => {
 
   describe("octaves", () => {{
     it("throws a RangeError when set to a number that is not an integer", () => {
-      Array(100).fill(() => (2*Math.random() - 1) * Number.MAX_SAFE_INTEGER)
+      Array(100).fill(() => getRandomNumber())
         .map(generator => generator())
         .filter(num => !Number.isInteger(num))
         .forEach((num) => {
