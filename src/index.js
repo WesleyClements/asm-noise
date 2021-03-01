@@ -11,21 +11,23 @@ let octaves = 8;
 let lacunarity = (1 + Math.sqrt(5)) / 2;
 let persistence = Math.abs(1 - Math.sqrt(5)) / 2;
 
-const offset = {
-  x: 5393 * lacunarity,
-  y: 4691 * lacunarity,
-  z: 10093 * lacunarity,
-  w: 9241 * lacunarity,
-};
-
-const offsetProxy = new Proxy(offset, {
-  set(obj, prop, value) {
-    if (!/^x|y|z|y$/.test(prop)) Reflect.set(...arguments);
-    if (typeof value !== 'number') throw TypeError(`offset.${prop} must be a number`);
-    if (Number.isNaN(value)) throw RangeError(`offset.${prop} cannot be NaN`);
-    obj[prop.value];
-  },
-});
+const offset = new Proxy(
+  {
+    x: 5393 * lacunarity,
+    y: 4691 * lacunarity,
+    z: 10093 * lacunarity,
+    w: 9241 * lacunarity,
+  }, 
+  {
+    set(obj, prop, value) {
+      if (!/^x|y|z|y$/.test(prop)) Reflect.set(...arguments);
+      if (typeof value !== 'number') throw TypeError(`offset.${prop} must be a number`);
+      if (Number.isNaN(value)) throw RangeError(`offset.${prop} cannot be NaN`);
+      if (Number.is(value)) throw RangeError(`offset.${prop} cannot be NaN`);
+      obj[prop] = value;
+    },
+  }
+);
 
 const noise = Object.defineProperties(
   function noise(x, y, z, w) {
@@ -61,20 +63,14 @@ const noise = Object.defineProperties(
     config: {
       value(options) {
         if (options == null) return;
-        const { seed, algorithm, octaves, lacunarity, persistence, offset } = options;
-        if (algorithm != null) this.algorithm = algorithm;
-        if (seed != null) this.seed = seed;
-        if (octaves != null) this.octaves = octaves;
-        if (lacunarity != null) this.lacunarity = lacunarity;
-        if (persistence != null) this.persistence = persistence;
-        if (offset != null) this.offset = offset;
+        Object.entries(options)
+          .forEach(([key, value]) => this[key] = value);
       },
     },
     algorithm: {
       get: () => algorithm,
       set(value) {
         if (typeof value !== 'string') throw TypeError('algorithm must be a string');
-        value = value.toLowerCase();
         if (!algorithms.has(value)) throw Error(`invalid algorithm: ${value}`);
         algorithm = value;
       },
@@ -112,36 +108,23 @@ const noise = Object.defineProperties(
       },
     },
     offset: {
-      get: () => offsetProxy,
+      get: () => offset,
       set(value) {
         if (typeof value != 'object') throw TypeError('offset must be a object');
-        offsetProxy.x = value.x ?? 0;
-        offsetProxy.y = value.y ?? 0;
-        offsetProxy.z = value.z ?? 0;
-        offsetProxy.w = value.w ?? 0;
+        if (value === null) throw TypeError('offset must not be null');
+        Object.entries(value)
+          .forEach(([key, value]) => offset[key] = value);
       },
     },
   }
 );
 
-new Promise((resolve) => setTimeout(() => resolve(), 0)).then(
-  [...algorithms.values()].forEach((algorithm) => {
-    algorithm.noise2D(octaves, lacunarity, persistence, offset.x, offset.y, 0, 0);
-    algorithm.noise3D(octaves, lacunarity, persistence, offset.x, offset.y, offset.z, 0, 0, 0);
-    algorithm.noise4D(
-      octaves,
-      lacunarity,
-      persistence,
-      offset.x,
-      offset.y,
-      offset.z,
-      offset.w,
-      0,
-      0,
-      0,
-      0
-    );
-  })
-);
+(async () => {
+  await new Promise(resolve => setTimeout(() => resolve(), 0));
+  const primeNoise = noise => noise(...Array(9).fill(1));
+  algorithms.forEach(({noise2D, noise3D, noise4D}) => {
+    [noise2D, noise3D, noise4D].forEach(primeNoise);
+  });
+})();
 
 export default noise;
