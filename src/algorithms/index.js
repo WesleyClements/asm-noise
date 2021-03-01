@@ -1,2 +1,7 @@
-export { default as perlin } from './perlin';
-export { default as openSimplexUnoptimized } from './openSimplexUnoptimized';
+import perlin from './perlin';
+import openSimplexUnoptimized from './openSimplexUnoptimized';
+
+export default {
+  perlin,
+  "open-simplex": openSimplexUnoptimized
+}
