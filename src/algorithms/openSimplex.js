@@ -2,6 +2,7 @@ import random from '../util/random.js';
 
 function OpenSimplex(stdlib, foreign, heap) {
   'use asm';
+  
   var imul = stdlib.Math.imul;
   var floor = stdlib.Math.floor;
 

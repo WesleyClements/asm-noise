@@ -1,7 +1,8 @@
-import random from './random.js';
+import random from '../util/random';
 
 function OpenSimplexUnoptimized(stdlib, foreign, heap) {
   'use asm';
+
   var imul = stdlib.Math.imul;
   var floor = stdlib.Math.floor;
 

@@ -1,7 +1,8 @@
-import random from './random.js';
+import random from '../util/random.js';
 
 function Perlin(stdlib, foreign, heap) {
   'use asm';
+  
   var floor = stdlib.Math.floor;
 
   var _setSeed = foreign.setSeed;
