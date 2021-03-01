@@ -95,6 +95,7 @@ const noise = Object.defineProperties(
       get: () => settings.lacunarity,
       set(value) {
         if (typeof value !== "number") throw TypeError("lacunarity must be a number");
+        if (Number.isNaN(value)) throw RangeError("octave cannot be NaN");
         if (value === 0) throw RangeError("lacunarity must not be 0");
         settings.lacunarity = value;
       },
