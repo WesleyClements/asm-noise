@@ -87,6 +87,7 @@ const noise = Object.defineProperties(
       set(value) {
         if (typeof value !== "number") throw TypeError("octave must be a number");
         if (Number.isNaN(value)) throw RangeError("octave cannot be NaN");
+        if (!Number.isInteger(value)) throw RangeError("octave must be integer");
         if (value < 1) throw RangeError("octave must greater than 0");
         settings.octaves = value;
       },
