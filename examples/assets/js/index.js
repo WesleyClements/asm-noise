@@ -1,22 +1,23 @@
+/*global generateNoiseImageSync */
 (() => {
-  const noiseWorker = window.Worker ? new Worker('./assets/js/noiseWorker.js') : null;
-  const main = document.querySelector('main');
+  const noiseWorker = window.Worker ? new Worker("./assets/js/noiseWorker.js") : null;
+  const main = document.querySelector("main");
 
-  const canvas = main.querySelector('canvas');
-  const ui = main.querySelector('#ui');
-  const uiToggle = ui.querySelector('#ui-toggle');
-  const uiContent = ui.querySelector('#ui-content');
+  const canvas = main.querySelector("canvas");
+  const ui = main.querySelector("#ui");
+  const uiToggle = ui.querySelector("#ui-toggle");
+  const uiContent = ui.querySelector("#ui-content");
 
   // config inputs
-  const algorithmSelect = ui.querySelector('#algorithm-select');
-  const dimensionSelect = ui.querySelector('#dimension-select');
-  const seedInput = ui.querySelector('input[name=seed]');
-  const scaleInput = ui.querySelector('input[name=scale]');
-  const scaleSlider = ui.querySelector('input[name=scale-slider]');
-  const resolutionInput = ui.querySelector('input[name=resolution]');
-  const resolutionSlider = ui.querySelector('input[name=resolution-slider]');
-  const generateBtn = ui.querySelector('#generate-btn');
-  const saveBtn = ui.querySelector('#save-btn');
+  const algorithmSelect = ui.querySelector("#algorithm-select");
+  const dimensionSelect = ui.querySelector("#dimension-select");
+  const seedInput = ui.querySelector("input[name=seed]");
+  const scaleInput = ui.querySelector("input[name=scale]");
+  const scaleSlider = ui.querySelector("input[name=scale-slider]");
+  const resolutionInput = ui.querySelector("input[name=resolution]");
+  const resolutionSlider = ui.querySelector("input[name=resolution-slider]");
+  const generateBtn = ui.querySelector("#generate-btn");
+  const saveBtn = ui.querySelector("#save-btn");
 
   const configInputs = [
     algorithmSelect,
@@ -30,7 +31,7 @@
     saveBtn,
   ];
 
-  const generationMetricsSpan = ui.querySelector('#generation-metrics');
+  const generationMetricsSpan = ui.querySelector("#generation-metrics");
 
   let renderCount = 0;
 
@@ -50,12 +51,12 @@
   const getNoiseImageFromWorker =
     noiseWorker &&
     (async (settings) => {
-      return await new Promise((resolve, reject) => {
+      return await new Promise((resolve) => {
         const onMessage = (e) => {
-          noiseWorker.removeEventListener('message', onMessage);
+          noiseWorker.removeEventListener("message", onMessage);
           resolve(e.data);
         };
-        noiseWorker.addEventListener('message', onMessage);
+        noiseWorker.addEventListener("message", onMessage);
         noiseWorker.postMessage(settings);
       });
     });
@@ -68,7 +69,7 @@
       scale,
       resolution,
       width,
-      height
+      height,
     };
     const generate = getNoiseImageFromWorker ?? generateNoiseImageSync;
     const { dt, noiseValues, imgData } = await generate(settings);
@@ -90,10 +91,10 @@
       renderHandle = setTimeout(async () => {
         rendering = true;
 
-        generateBtn.classList.add('is-loading', 'disabled');
+        generateBtn.classList.add("is-loading", "disabled");
 
         // disable config inputs while rendering
-        configInputs.forEach((configInput) => configInput.setAttribute('disabled', true));
+        configInputs.forEach((configInput) => configInput.setAttribute("disabled", true));
 
         // wait on a timeout to allow browser to do it's stuff
         await wait();
@@ -107,16 +108,16 @@
         });
 
         // re-enble config inputs after rendering
-        configInputs.forEach((configInput) => configInput.removeAttribute('disabled'));
+        configInputs.forEach((configInput) => configInput.removeAttribute("disabled"));
 
-        generateBtn.classList.remove('is-loading', 'disabled');
+        generateBtn.classList.remove("is-loading", "disabled");
         [canvas, generationMetricsSpan].forEach((hiddenEl) => (hiddenEl.style.display = null));
 
         generationMetricsSpan.textContent = `Generated ${noiseValues.length} noise values in ${dt}ms`;
 
         // render image to screen after the browser does it's stuff
         await wait();
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext("2d");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.putImageData(imgData, 0, 0);
 
@@ -126,13 +127,13 @@
     };
   })();
 
-  window.addEventListener('resize', () => {
+  window.addEventListener("resize", () => {
     updateCanvasDimensions();
     if (renderCount) renderNoise();
   });
 
-  ui.addEventListener('mousedown', (e) => {
-    if (!e.target.closest('#ui-handle')) return;
+  ui.addEventListener("mousedown", (e) => {
+    if (!e.target.closest("#ui-handle")) return;
     e.preventDefault();
 
     const rect = ui.getBoundingClientRect();
@@ -142,8 +143,8 @@
 
     const onMouseMove = (e) => {
       e.preventDefault();
-      ui.style.top = e.pageY + yOffset + 'px';
-      ui.style.left = e.pageX + xOffset + 'px';
+      ui.style.top = e.pageY + yOffset + "px";
+      ui.style.left = e.pageX + xOffset + "px";
       ui.style.bottom = null;
       ui.style.right = null;
     };
@@ -169,25 +170,25 @@
       } else {
         ui.style.right = null;
       }
-      document.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', finalizeMove);
-      document.removeEventListener('blur', finalizeMove);
+      document.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", finalizeMove);
+      document.removeEventListener("blur", finalizeMove);
     };
-    document.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', finalizeMove);
-    document.addEventListener('blur', finalizeMove);
+    document.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", finalizeMove);
+    document.addEventListener("blur", finalizeMove);
   });
 
   (function () {
     let showUI = true;
-    uiToggle.addEventListener('click', () => {
+    uiToggle.addEventListener("click", () => {
       showUI = !showUI;
       if (showUI) {
-        uiToggle.innerHTML = `<i class="fas fa-minus"></i>`;
-        uiContent.removeAttribute('style');
+        uiToggle.innerHTML = "<i class=\"fas fa-minus\"></i>";
+        uiContent.removeAttribute("style");
       } else {
-        uiToggle.innerHTML = `<i class="fas fa-plus"></i>`;
-        uiContent.style.display = 'none';
+        uiToggle.innerHTML = "<i class=\"fas fa-plus\"></i>";
+        uiContent.style.display = "none";
       }
     });
   })();
@@ -195,11 +196,11 @@
   (function () {
     let configNoiseHandle;
 
-    algorithmSelect.addEventListener('change', () => {
+    algorithmSelect.addEventListener("change", () => {
       clearTimeout(configNoiseHandle);
       configNoise();
     });
-    seedInput.addEventListener('keydown', () => {
+    seedInput.addEventListener("keydown", () => {
       clearTimeout(configNoiseHandle);
       configNoiseHandle = setTimeout(() => {
         if (isNaN(seedInput.value)) {
@@ -213,7 +214,7 @@
 
   (function () {
     let updateScaleHandle;
-    scaleInput.addEventListener('keydown', () => {
+    scaleInput.addEventListener("keydown", () => {
       clearTimeout(updateScaleHandle);
       updateScaleHandle = setTimeout(() => {
         if (isNaN(scaleInput.value) || scaleInput.value <= 0) {
@@ -223,7 +224,7 @@
         scaleSlider.value = Math.log10(scaleInput.value);
       }, 300);
     });
-    scaleSlider.addEventListener('input', () => {
+    scaleSlider.addEventListener("input", () => {
       clearTimeout(updateScaleHandle);
       scaleInput.value = calculateScale(scaleSlider.value).toLocaleString(undefined, {
         maximumFractionDigits: 7,
@@ -233,29 +234,29 @@
 
   (function () {
     let updateResolutionHandle;
-    resolutionInput.addEventListener('keydown', () => {
+    resolutionInput.addEventListener("keydown", () => {
       clearTimeout(updateResolutionHandle);
       if (!resolutionInput.value) return;
       updateResolutionHandle = setTimeout(() => {
         if (isNaN(resolutionInput.value) || resolutionInput.value <= 0) {
-          resolutionInput.value = resolutionSlider.value + '%';
+          resolutionInput.value = resolutionSlider.value + "%";
           return;
         }
         resolutionSlider.value = scaleInput.value;
-        resolutionInput.value += '%';
+        resolutionInput.value += "%";
       }, 300);
     });
-    resolutionSlider.addEventListener('input', () => {
+    resolutionSlider.addEventListener("input", () => {
       clearTimeout(updateResolutionHandle);
-      resolutionInput.value = resolutionSlider.value + '%';
+      resolutionInput.value = resolutionSlider.value + "%";
     });
   })();
 
-  generateBtn.addEventListener('click', renderNoise);
-  saveBtn.addEventListener('click', () => {
-    const link = document.createElement('a');
-    link.setAttribute('download', algorithmSelect.value + '-noise');
-    link.setAttribute('href', canvas.toDataURL('image/png'));
+  generateBtn.addEventListener("click", renderNoise);
+  saveBtn.addEventListener("click", () => {
+    const link = document.createElement("a");
+    link.setAttribute("download", algorithmSelect.value + "-noise");
+    link.setAttribute("href", canvas.toDataURL("image/png"));
     link.click();
   });
 
