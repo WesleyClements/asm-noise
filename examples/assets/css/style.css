@@ -1,3 +1,6 @@
+@import url("https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css");
+@import url("https://unpkg.com/bulma-slider@2.0.4/dist/css/bulma-slider.min.css");
+
 * {
   padding: 0px;
   margin: 0px;
