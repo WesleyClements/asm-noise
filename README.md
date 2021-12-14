@@ -44,7 +44,11 @@ var noise = require('asm-noise');
 import noise from 'asm-noise';
 ```
 
-When using CDN, functionality is exposed globally through `window.noise` .
+When linked directly in HTML using CDN, functionality is exposed globally through `window.noise` .
+
+```html
+<script src="https://unpkg.com/asm-noise"></script>
+```
 
 Generate noise:
 
@@ -125,7 +129,7 @@ Default: `(Math.sqrt(5) - 1) / 2`
 
 Type: `{ x: Number; y: Number; z: Number; w: Number; }`
 
-Contains axis specific values to add to the generation point between generation itterations.
+Contains axis specific values to add to the generation point every generation itteration.
 
 Default:
 
@@ -140,7 +144,7 @@ Default:
 
 ## [Roadmap](#roadmap)
 
-- Improve performance of algorithms
+- Improve performance of algorithm implementations
 - Implement additional algorithms
 - Add batch generation
 
