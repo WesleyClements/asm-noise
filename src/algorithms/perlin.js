@@ -1,7 +1,7 @@
-import random from "../util/random";
+import random from '../util/random';
 
 function Perlin(stdlib, foreign, heap) {
-  "use asm";
+  'use asm';
 
   var floor = stdlib.Math.floor;
 

@@ -1,7 +1,7 @@
-import random from "../util/random";
+import random from '../util/random';
 
 function OpenSimplex(stdlib, foreign, heap) {
-  "use asm";
+  'use asm';
 
   var imul = stdlib.Math.imul;
   var floor = stdlib.Math.floor;
@@ -595,7 +595,7 @@ function OpenSimplex(stdlib, foreign, heap) {
   return {
     setSeed: setSeed,
     noise2D: noise2D,
-    noise3D: noise4D,
+    noise3D: noise3D,
     noise4D: noise4D,
   };
 }
@@ -993,10 +993,7 @@ const heap = new ArrayBuffer(0x1000000);
       offset += 6 << 1;
     };
 
-    const start = offset;
-    let count = 0;
     for (let i = 0; i < p4D.length; i += 16) {
-      count++;
       const baseSet = base4D[p4D[i]];
       const length = baseSet.length / 5 + 3;
       heapU32[offset] = length;

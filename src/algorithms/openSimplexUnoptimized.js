@@ -1,7 +1,8 @@
-import random from "../util/random";
+/* eslint-disable camelcase */
+import random from '../util/random';
 
 function OpenSimplexUnoptimized(stdlib, foreign, heap) {
-  "use asm";
+  'use asm';
 
   var imul = stdlib.Math.imul;
   var floor = stdlib.Math.floor;
@@ -1211,7 +1212,9 @@ function OpenSimplexUnoptimized(stdlib, foreign, heap) {
 
     var aIsBiggerSide = 0;
     var bIsBiggerSide = 0;
+    // eslint-disable-next-line no-unused-vars
     var aIsFurtherSide = 0;
+    // eslint-disable-next-line no-unused-vars
     var bIsFurtherSide = 0;
 
     var c = 0;
