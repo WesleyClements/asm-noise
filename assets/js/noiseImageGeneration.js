@@ -1,4 +1,5 @@
-const generateNoiseImageSync = (() => {
+/* exported generateNoiseImageSync */
+var generateNoiseImageSync = (() => {
   const getValueIndex = (resolution, resolutionX, i, j) => {
     return Math.floor(i * resolution) + Math.floor(j * resolution) * resolutionX;
   };
