@@ -106,3 +106,5 @@ dist
 .vscode/
 
 umd/
+
+package-lock.json
