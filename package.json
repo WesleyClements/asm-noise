@@ -10,6 +10,7 @@
     "start": "webpack-dev-server --open --config webpack/webpack.development.js",
     "build": "webpack --config webpack/webpack.production.js",
     "deploy": "npx gh-pages -d examples",
+    "prepublish": "npm run build",
     "test": "jest"
   },
   "repository": {
