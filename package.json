@@ -39,7 +39,7 @@
     "url": "https://github.com/WesleyClements/asm-noise/issues"
   },
   "homepage": "https://github.com/WesleyClements/asm-noise#readme",
-  "dependencies": {
+  "devDependencies": {
     "@babel/core": "^7.16.5",
     "@babel/preset-env": "^7.16.5",
     "@types/jest": "^27.0.3",
