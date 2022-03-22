@@ -386,8 +386,8 @@ function OpenSimplex(stdlib, foreign, heap) {
       amplitude = amplitude * persistence;
       x = x + xOffset;
       y = y + yOffset;
-      z = z + yOffset;
-      w = w + yOffset;
+      z = z + zOffset;
+      w = w + wOffset;
     }
     return total / max;
   }
