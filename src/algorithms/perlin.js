@@ -150,7 +150,7 @@ function Perlin(stdlib, foreign, heap) {
       amplitude = amplitude * persistence;
       x = x + xOffset;
       y = y + yOffset;
-      z = z + yOffset;
+      z = z + zOffset;
     }
     return total / max;
   }
