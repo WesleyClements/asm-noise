@@ -3,6 +3,8 @@
 [![npm version](https://badge.fury.io/js/asm-noise.svg)](https://badge.fury.io/js/asm-noise)
 
 An implementation of noise algorithms in asm.js.
+Due to asm.js being deprecated, this package has no advantages to native JavaScript code.
+Check out [`simplex-noise`](https://www.npmjs.com/package/simplex-noise)!
 
 ## Table of Contents
 
@@ -13,10 +15,6 @@ An implementation of noise algorithms in asm.js.
 1. [Contributing](#contributing)
 1. [Acknowledgments](#acknowledgments)
 1. [License](#license)
-
-## Goal and Philosophy
-
-**`asm-noise`** endeavors to allow the fastest, most flexible multidimensional procedural noise generation possible with only JavaScript.
 
 ## [Installation](#installation)
 
