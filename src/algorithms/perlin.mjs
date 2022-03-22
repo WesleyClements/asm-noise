@@ -1,4 +1,4 @@
-import random from '../util/random';
+import random from '../util/random.mjs';
 
 function Perlin(stdlib, foreign, heap) {
   'use asm';

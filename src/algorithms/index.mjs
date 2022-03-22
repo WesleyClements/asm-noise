@@ -1,5 +1,5 @@
-import perlin from './perlin';
-import openSimplexUnoptimized from './openSimplexUnoptimized';
+import perlin from './perlin.mjs';
+import openSimplexUnoptimized from './openSimplexUnoptimized.mjs';
 
 export const defaultAlgorithm = 'open-simplex';
 

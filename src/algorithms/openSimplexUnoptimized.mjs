@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import random from '../util/random';
+import random from '../util/random.mjs';
 
 function OpenSimplexUnoptimized(stdlib, foreign, heap) {
   'use asm';
